@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Second Harvest of Silicon Valley — Partner Agency Shopping Log</title>
+<style>
+  :root{
+    --green:#4a8a2e;--green-dark:#2f5e1c;--green-deep:#234716;--green-tint:#eaf3e1;
+    --green-line:#cfe3bd;--orange:#e8722a;--paper:#fbf8f2;--ink:#23301a;--muted:#6e7c63;
+    --white:#fff;--shadow:0 10px 30px rgba(35,71,22,.12);--radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#e7f0dd,#d4e6c4);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+  .phone{width:390px;max-width:100%;height:800px;max-height:94vh;background:var(--paper);
+    border-radius:38px;position:relative;overflow:hidden;
+    box-shadow:0 30px 60px rgba(35,71,22,.28),0 0 0 10px #1c2b14,0 0 0 12px #34472a;
+    display:flex;flex-direction:column}
+  .statusbar{height:34px;flex:0 0 34px;background:var(--green-deep);color:#dff0d0;
+    display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:600}
+  .statusbar .dots{letter-spacing:2px}
+
+  header.app{background:var(--green);color:#fff;padding:14px 18px 16px;flex:0 0 auto;position:relative}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .wm{line-height:1.02}
+  .brand .wm .n1{font-weight:800;font-size:16px}
+  .brand .wm .n2{font-weight:600;font-size:10.5px;letter-spacing:2.2px;text-transform:uppercase;opacity:.92}
+  .subbar{margin-top:11px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.16);display:inline-block;padding:4px 11px;border-radius:999px}
+  .gear{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.18);border:none;border-radius:10px;
+    width:34px;height:34px;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .gear:active{transform:scale(.95)}
+
+  .screens{flex:1 1 auto;overflow-y:auto;position:relative}
+  .screen{display:none;padding:18px 18px 30px;animation:fade .25s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  h2.title{font-size:19px;margin:4px 0 2px;color:var(--green-deep)}
+  p.lead{margin:0 0 16px;color:var(--muted);font-size:13.5px;line-height:1.5}
+  label{display:block;font-size:12.5px;font-weight:700;color:var(--green-dark);margin:14px 0 5px}
+  .req{color:var(--orange)}
+  input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],select{
+    width:100%;padding:13px 14px;border:1.5px solid var(--green-line);border-radius:12px;
+    font-size:16px;background:#fff;color:var(--ink);font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,138,46,.15)}
+  input[readonly]{background:var(--green-tint);color:var(--green-deep);font-weight:600;border-style:dashed}
+  .row2{display:flex;gap:10px}.row2>div{flex:1}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .filled-flag{display:none;font-size:11.5px;color:var(--green);font-weight:700;margin-top:6px}
+  .filled-flag.show{display:block}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;
+    border-radius:14px;font-size:15.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .05s,filter .15s}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--green);color:#fff;box-shadow:var(--shadow)}
+  .btn-primary:disabled{background:#bcd0a9;box-shadow:none;cursor:not-allowed}
+  .btn-orange{background:var(--orange);color:#fff}
+  .btn-ghost{background:#fff;color:var(--green-dark);border:1.5px solid var(--green-line)}
+  .btn-sm{padding:11px;font-size:13.5px;border-radius:11px}
+  .stack>*{margin-top:12px}
+
+  .scanner{background:var(--green-deep);border-radius:18px;height:200px;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .reticle{width:140px;height:140px;border-radius:18px;position:relative}
+  .reticle span{position:absolute;width:26px;height:26px;border:3px solid #bff09a}
+  .reticle .tl{top:0;left:0;border-right:none;border-bottom:none;border-radius:8px 0 0 0}
+  .reticle .tr{top:0;right:0;border-left:none;border-bottom:none;border-radius:0 8px 0 0}
+  .reticle .bl{bottom:0;left:0;border-right:none;border-top:none;border-radius:0 0 0 8px}
+  .reticle .br{bottom:0;right:0;border-left:none;border-top:none;border-radius:0 0 8px 0}
+  .scanline{position:absolute;left:8%;right:8%;height:2px;background:#bff09a;box-shadow:0 0 10px #bff09a;animation:scan 2.4s ease-in-out infinite}
+  @keyframes scan{0%,100%{top:18%}50%{top:78%}}
+  .scan-cap{color:#cde7b6;font-size:12px;text-align:center;margin:-2px 0 12px}
+  .demo-note{background:var(--green-tint);border:1px dashed var(--green-line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--green-dark);margin-bottom:12px;line-height:1.45}
+  .tag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tag{background:#fff;border:1.5px solid var(--green-line);border-radius:14px;padding:12px 10px;text-align:center;cursor:pointer;transition:transform .05s}
+  .tag:active{transform:scale(.97)}
+  .tag .emo{font-size:30px;display:block}
+  .tag .nm{font-weight:700;font-size:13px;margin-top:4px;color:var(--green-deep)}
+  .tag .cd{font-size:10px;color:var(--muted)}
+  .unit-chip{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-top:5px}
+  .chip-lb{background:var(--green-tint);color:var(--green-dark)}
+  .chip-cs{background:#fbe6d6;color:#b5571a}
+
+  .item-hero{text-align:center;padding:10px 0 4px}
+  .item-hero .emo{font-size:60px}
+  .item-hero .nm{font-size:22px;font-weight:800;color:var(--green-deep);margin-top:2px}
+  .limit-banner{background:var(--green-tint);border-radius:10px;color:var(--green-dark);font-weight:700;font-size:12.5px;text-align:center;padding:7px;margin:8px 0 0}
+  .qty-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px 0 4px}
+  .qty-wrap input{font-size:34px;font-weight:800;text-align:center;width:140px;padding:10px;border-radius:14px}
+  .qty-unit{font-size:20px;font-weight:800;color:var(--green)}
+  .stepper{display:flex;gap:10px;justify-content:center;margin-top:6px}
+  .stepper button{width:54px;height:46px;border-radius:12px;border:1.5px solid var(--green-line);background:#fff;font-size:22px;font-weight:800;color:var(--green-dark);cursor:pointer}
+  .entry-help{text-align:center;color:var(--muted);font-size:13px;margin-top:12px;line-height:1.5}
+  .warn{display:none;background:#fcebe2;color:#b5401a;border:1px solid #f3c4ad;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;text-align:center;margin-top:12px}
+  .warn.show{display:block}
+
+  .cart-item{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--green-line);border-radius:14px;padding:11px 12px;margin-bottom:10px}
+  .cart-item .emo{font-size:28px}.cart-item .info{flex:1}
+  .cart-item .info .nm{font-weight:700;font-size:14px;color:var(--green-deep)}
+  .cart-item .info .q{font-size:12.5px;color:var(--muted)}
+  .cart-item .rm{background:none;border:none;color:#c0392b;font-size:13px;font-weight:700;cursor:pointer;padding:6px}
+  .empty{text-align:center;color:var(--muted);padding:36px 10px;font-size:14px}
+  .summary-card{background:#fff;border:1px solid var(--green-line);border-radius:14px;padding:14px;margin-bottom:14px}
+  .summary-card .r{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;gap:10px}
+  .summary-card .r .k{color:var(--muted)}.summary-card .r .v{font-weight:700;color:var(--green-deep);text-align:right}
+
+  .sig-pad{border:1.5px dashed var(--green-line);border-radius:14px;background:#fff;touch-action:none;width:100%;height:150px;display:block}
+  .sig-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+  .sig-row .lbl{font-size:12px;color:var(--muted)}
+  .sig-clear{background:none;border:none;color:var(--green);font-weight:700;font-size:12.5px;cursor:pointer}
+
+  .done{text-align:center;padding:18px 6px}
+  .done .check{width:84px;height:84px;border-radius:50%;background:var(--green-tint);display:flex;align-items:center;justify-content:center;margin:6px auto 12px}
+  .done h2{color:var(--green-deep);font-size:22px;margin:6px 0}
+  .done .ord{font-size:13px;color:var(--muted)}.done .ord b{color:var(--green-dark)}
+  .email-pill{background:var(--green-tint);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--green-dark);margin:12px 0;line-height:1.45}
+
+  .backlink{background:none;border:none;color:var(--green);font-weight:700;font-size:13.5px;cursor:pointer;padding:4px 0;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+
+  .tabs{display:flex;gap:6px;margin:2px 0 14px;background:var(--green-tint);padding:4px;border-radius:12px}
+  .tabs button{flex:1;border:none;background:none;padding:9px;border-radius:9px;font-weight:700;font-size:12.5px;color:var(--green-dark);cursor:pointer}
+  .tabs button.on{background:#fff;color:var(--green-deep);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .tabpane{display:none}.tabpane.on{display:block}
+  .cfg-card{background:#fff;border:1px solid var(--green-line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .cfg-card .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cfg-card label{margin:6px 0 3px;font-size:11px}
+  .cfg-card input,.cfg-card select{padding:9px 10px;font-size:14px;border-radius:9px}
+  .cfg-card .top{display:flex;justify-content:space-between;align-items:center}
+  .cfg-card .top .ttl{font-weight:800;color:var(--green-deep);font-size:14px}
+  .del{background:none;border:none;color:#c0392b;font-weight:700;font-size:12px;cursor:pointer;padding:4px}
+  .mini{font-size:11px;color:var(--muted);margin:2px 0 8px}
+  .ov-toggle{background:none;border:none;color:var(--green);font-weight:700;font-size:12px;cursor:pointer;padding:6px 0}
+  .ov-panel{display:none;border-top:1px solid var(--green-line);margin-top:8px;padding-top:8px}
+  .ov-panel.show{display:block}
+  .ov-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .ov-row .ovn{flex:1;font-size:12.5px;color:var(--green-deep);font-weight:600}
+  .ov-row input{width:78px;text-align:center}
+  .ov-row .du{font-size:11px;color:var(--muted);width:40px}
+  .saved-toast{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:var(--green-deep);color:#fff;
+    padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none}
+  .saved-toast.show{opacity:1}
+
+  .modal-bg{display:none;position:absolute;inset:0;background:rgba(20,35,12,.5);z-index:20;align-items:center;justify-content:center;padding:18px}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:16px;width:100%;max-height:88%;overflow-y:auto;box-shadow:var(--shadow)}
+  .modal .mhead{background:var(--green);color:#fff;padding:12px 14px;border-radius:16px 16px 0 0;font-weight:800;font-size:14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+  .modal .mhead button{background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:8px;font-size:15px;cursor:pointer}
+  .email-body{padding:16px}
+  .email-meta{font-size:12px;color:var(--muted);border-bottom:1px solid #eee;padding-bottom:10px;margin-bottom:12px;line-height:1.7}
+  .email-meta b{color:var(--ink)}
+  .email-h{color:var(--green-deep);font-size:17px;margin:0 0 4px}
+  table.lines{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+  table.lines th{text-align:left;color:var(--muted);font-weight:700;border-bottom:2px solid var(--green-line);padding:6px 4px}
+  table.lines td{padding:7px 4px;border-bottom:1px solid #eee}
+  table.lines td.num{text-align:right;font-weight:700;color:var(--green-deep)}
+  .sig-block{margin-top:14px}
+  .sig-block .sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .sig-block img{border-bottom:1.5px solid var(--ink);max-width:230px;display:block;margin-top:4px}
+
+  #printArea{display:none}
+  @media print{
+    body{background:#fff;padding:0;display:block}
+    body.printing .phone{display:none!important}
+    body.printing .modal-bg{display:none!important}
+    body.printing #printArea{display:block!important;padding:36px;color:#000;font-family:Georgia,serif;max-width:720px;margin:0 auto}
+    #printArea .inv-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2f5e1c;padding-bottom:14px}
+    #printArea .org{font-size:22px;font-weight:bold;color:#2f5e1c}
+    #printArea .org small{display:block;font-size:11px;letter-spacing:3px;color:#4a8a2e;font-weight:normal}
+    #printArea h1{font-size:16px;text-align:right;margin:0;color:#333}
+    #printArea .meta{display:flex;gap:40px;margin:18px 0}
+    #printArea .meta div{font-size:13px;line-height:1.7}
+    #printArea .meta b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#777}
+    #printArea table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+    #printArea th{text-align:left;border-bottom:2px solid #2f5e1c;padding:8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+    #printArea td{padding:9px 6px;border-bottom:1px solid #ddd}
+    #printArea td.n{text-align:right;font-weight:bold}
+    #printArea .sig{margin-top:50px}
+    #printArea .sig img{max-width:260px;border-bottom:1px solid #000;display:block}
+    #printArea .sig .cap{font-size:11px;color:#555;margin-top:4px}
+    #printArea .ftr{margin-top:40px;font-size:11px;color:#888;text-align:center;border-top:1px solid #ddd;padding-top:12px}
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span class="dots">●●● ⌃ 100%</span></div>
+
+  <header class="app">
+    <div class="brand">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="23" fill="#ffffff" opacity="0.14"/>
+        <g fill="#ffffff">
+          <path d="M24 7c2.4 2 3.2 4.7 2.2 7.6-1 2.9-3 4.4-5.4 4.9 0-2.7.6-5.2 1.5-7C23.2 10.6 23.6 8.7 24 7z"/>
+          <path d="M24 7c-2.4 2-3.2 4.7-2.2 7.6 1 2.9 3 4.4 5.4 4.9 0-2.7-.6-5.2-1.5-7C24.8 10.6 24.4 8.7 24 7z" opacity="0.85"/>
+          <path d="M16 14c2.9.7 4.9 2.6 5.6 5.5.7 2.9-.1 5.3-1.6 7.1-1.7-2-2.9-4.3-3.4-6.3C15.9 17.7 15.8 15.8 16 14z"/>
+          <path d="M32 14c-2.9.7-4.9 2.6-5.6 5.5-.7 2.9.1 5.3 1.6 7.1 1.7-2 2.9-4.3 3.4-6.3.7-2.6.8-4.5.6-6.3z"/>
+          <path d="M13 23c2.8 1 4.5 3.2 4.8 6.1.3 2.6-.7 4.8-2.4 6.4-1.4-2.2-2.2-4.6-2.4-6.7-.2-2.2 0-4 0-5.8z"/>
+          <path d="M35 23c-2.8 1-4.5 3.2-4.8 6.1-.3 2.6.7 4.8 2.4 6.4 1.4-2.2 2.2-4.6 2.4-6.7.2-2.2 0-4 0-5.8z"/>
+          <rect x="22.7" y="22" width="2.6" height="20" rx="1.3"/>
+        </g>
+      </svg>
+      <div class="wm"><div class="n1">Second Harvest</div><div class="n2">of Silicon Valley</div></div>
+    </div>
+    <div class="subbar" id="subbar">Partner Agency Shopping Log</div>
+    <button class="gear" id="gearBtn" title="Admin">⚙</button>
+  </header>
+
+  <div class="screens">
+
+    <section class="screen active" id="s-intake">
+      <h2 class="title">Welcome — let's get started</h2>
+      <p class="lead">Enter your agency and your name to begin recording the food you're picking up today.</p>
+      <label>Agency number <span class="req">*</span></label>
+      <input type="text" id="agencyNum" inputmode="numeric" placeholder="e.g. 1042" autocomplete="off">
+      <div class="hint" id="agencyHint"></div>
+      <label>Agency name <span class="req">*</span></label>
+      <input type="text" id="agencyName" placeholder="Auto-fills from your agency number">
+      <div class="filled-flag" id="agencyFlag">✓ Filled from agency profile</div>
+      <div class="row2">
+        <div><label>First name <span class="req">*</span></label><input type="text" id="firstName" placeholder="First" autocomplete="off"></div>
+        <div><label>Last name <span class="req">*</span></label><input type="text" id="lastName" placeholder="Last" autocomplete="off"></div>
+      </div>
+      <label>Date <span class="req">*</span></label>
+      <input type="date" id="visitDate">
+      <div class="stack" style="margin-top:22px"><button class="btn btn-primary" id="toScan" disabled>Start shopping →</button></div>
+    </section>
+
+    <section class="screen" id="s-scan">
+      <h2 class="title">Scan a shelf tag</h2>
+      <p class="lead">Point your camera at the QR code on the product's shelf tag.</p>
+      <div class="scanner"><div class="reticle"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div><div class="scanline"></div></div>
+      <div class="scan-cap">Searching for a code…</div>
+      <div class="demo-note">📱 <b>Demo:</b> a real device reads the QR automatically. Tap any shelf tag below to simulate a scan.</div>
+      <div class="tag-grid" id="tagGrid"></div>
+      <div class="stack" style="margin-top:14px"><button class="btn btn-ghost" id="toCartFromScan">Review cart (<span id="scanCount">0</span>)</button></div>
+    </section>
+
+    <section class="screen" id="s-item">
+      <button class="backlink" id="itemBack">‹ Back to scanning</button>
+      <div class="item-hero"><div class="emo" id="itemEmo">🍊</div><div class="nm" id="itemName">Oranges</div><div id="itemChip"></div></div>
+      <div class="limit-banner" id="limitBanner" style="display:none"></div>
+      <div class="entry-help" id="entryHelp"></div>
+      <div class="qty-wrap"><input type="number" id="qtyInput" inputmode="decimal" min="0" step="1" value=""><span class="qty-unit" id="qtyUnit">lbs</span></div>
+      <div class="stepper"><button id="qMinus">–</button><button id="qPlus">+</button></div>
+      <div class="warn" id="qtyWarn"></div>
+      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="addItem">Add to cart</button><button class="btn btn-ghost" id="cancelItem">Cancel</button></div>
+    </section>
+
+    <section class="screen" id="s-cart">
+      <button class="backlink" id="cartBack">‹ Add more items</button>
+      <h2 class="title">Your shopping log</h2>
+      <p class="lead" id="cartLead"></p>
+      <div id="cartList"></div>
+      <div class="stack" style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="addMore">+ Scan another item</button><button class="btn btn-primary" id="toSign" disabled>Review &amp; sign →</button></div>
+    </section>
+
+    <section class="screen" id="s-sign">
+      <button class="backlink" id="signBack">‹ Back to cart</button>
+      <h2 class="title">Confirm &amp; sign</h2>
+      <p class="lead">Review the details below, then sign to submit your pickup.</p>
+      <div class="summary-card" id="signSummary"></div>
+      <label>Signature <span class="req">*</span></label>
+      <canvas class="sig-pad" id="sigPad"></canvas>
+      <div class="sig-row"><span class="lbl">Sign with your finger or mouse</span><button class="sig-clear" id="sigClear">Clear</button></div>
+      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="submitBtn" disabled>Submit pickup</button></div>
+    </section>
+
+    <section class="screen" id="s-done">
+      <div class="done">
+        <div class="check"><svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4a8a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h2>Pickup submitted!</h2>
+        <p class="ord">Confirmation <b id="ordNum">#SH-000000</b></p>
+        <div class="email-pill" id="emailPill"></div>
+        <div class="summary-card" id="doneSummary" style="text-align:left"></div>
+        <div class="stack">
+          <button class="btn btn-ghost btn-sm" id="previewEmail">✉ Preview confirmation email</button>
+          <button class="btn btn-orange btn-sm" id="printInv">🖨 Print invoice</button>
+          <button class="btn btn-primary" id="newSession" style="margin-top:6px">Start a new pickup</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="s-admin-login">
+      <button class="backlink" id="adminLoginBack">‹ Back to shopping</button>
+      <h2 class="title">Admin sign-in</h2>
+      <p class="lead">Enter your PIN to manage items, agencies, and settings.</p>
+      <label>Admin PIN</label>
+      <input type="password" id="adminPin" inputmode="numeric" placeholder="••••" autocomplete="off">
+      <div class="hint">Demo PIN: <b>1234</b></div>
+      <div class="warn" id="pinWarn">Incorrect PIN.</div>
+      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="adminLoginBtn">Sign in</button></div>
+    </section>
+
+    <section class="screen" id="s-admin">
+      <button class="backlink" id="adminExit">‹ Exit admin</button>
+      <h2 class="title">Configuration</h2>
+      <div class="tabs">
+        <button data-tab="products" class="on">Items</button>
+        <button data-tab="agencies">Agencies</button>
+        <button data-tab="settings">Settings</button>
+      </div>
+      <div class="tabpane on" id="tab-products">
+        <p class="mini">Each item's <b>code</b> is what the shelf-tag QR encodes. Limit qty is the default max per pickup (leave 0 for no limit).</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn btn-ghost btn-sm" id="tplProd">⬇ Excel template</button>
+          <button class="btn btn-ghost btn-sm" id="impProd">⬆ Import Excel</button>
+        </div>
+        <input type="file" id="fileProd" accept=".xlsx,.xls,.csv" style="display:none">
+        <div id="prodList"></div>
+        <button class="btn btn-ghost btn-sm" id="addProd">+ Add item</button>
+        <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveProd">Save items</button></div>
+      </div>
+      <div class="tabpane" id="tab-agencies">
+        <p class="mini">Agency profiles. Use <b>Per-item limits</b> to override the default limit for a specific agency.</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn btn-ghost btn-sm" id="tplAgcy">⬇ Excel template</button>
+          <button class="btn btn-ghost btn-sm" id="impAgcy">⬆ Import Excel</button>
+        </div>
+        <input type="file" id="fileAgcy" accept=".xlsx,.xls,.csv" style="display:none">
+        <div id="agcyList"></div>
+        <button class="btn btn-ghost btn-sm" id="addAgcy">+ Add agency</button>
+        <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveAgcy">Save agencies</button></div>
+      </div>
+      <div class="tabpane" id="tab-settings">
+        <p class="mini">Where pickup confirmations are sent. The agency's own email also receives a copy.</p>
+        <div class="cfg-card">
+          <label>Warehouse / org confirmation email</label>
+          <input type="email" id="setOrgEmail">
+          <label>App subtitle</label>
+          <input type="text" id="setSubtitle">
+          <label>Admin PIN</label>
+          <input type="text" id="setPin">
+        </div>
+        <div class="stack"><button class="btn btn-primary" id="saveSettings">Save settings</button>
+        <button class="btn btn-ghost btn-sm" id="resetCfg">Reset to demo defaults</button></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="modal-bg" id="emailModal">
+    <div class="modal">
+      <div class="mhead"><span>Confirmation email</span><button id="closeEmail">✕</button></div>
+      <div class="email-body" id="emailBody"></div>
+    </div>
+  </div>
+
+  <div class="saved-toast" id="toast">Saved ✓</div>
+</div>
+
+<div id="printArea"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ---------- Persistent config ----------
+const LS_KEY='shfb_config_v1';
+const DEFAULTS={
+  products:[
+    {code:'PRD-001',name:'Oranges',emo:'🍊',unit:'lbs',limit:30},
+    {code:'PRD-002',name:'Potatoes',emo:'🥔',unit:'lbs',limit:25},
+    {code:'PRD-003',name:'Apples',emo:'🍎',unit:'lbs',limit:30},
+    {code:'PRD-004',name:'Carrots',emo:'🥕',unit:'lbs',limit:20},
+    {code:'PRD-005',name:'Bananas',emo:'🍌',unit:'lbs',limit:25},
+    {code:'PRD-006',name:'Eggs',emo:'🥚',unit:'case',limit:2},
+    {code:'PRD-007',name:'Milk',emo:'🥛',unit:'case',limit:3},
+    {code:'PRD-008',name:'Bread',emo:'🍞',unit:'case',limit:4}
+  ],
+  agencies:[
+    {number:'1042',name:'Sacred Heart Community Service',email:'pantry@sacredheartcs.org',limits:{}},
+    {number:'2087',name:'West Valley Community Services',email:'food@wvcs.org',limits:{}},
+    {number:'3155',name:'Loaves & Fishes Family Kitchen',email:'intake@loavesfishes.org',limits:{'PRD-006':1}},
+    {number:'4023',name:"Martha's Kitchen",email:'orders@marthas-kitchen.org',limits:{}},
+    {number:'5120',name:"St. Joseph's Family Center",email:'pantry@sjfc.org',limits:{}}
+  ],
+  settings:{orgEmail:'warehouse@shfb.org',subtitle:'Partner Agency Shopping Log',pin:'1234'}
+};
+let STATE;
+function loadConfig(){
+  try{const raw=localStorage.getItem(LS_KEY); STATE=raw?JSON.parse(raw):structuredClone(DEFAULTS);}
+  catch(e){STATE=structuredClone(DEFAULTS);}
+}
+function saveConfig(){try{localStorage.setItem(LS_KEY,JSON.stringify(STATE));}catch(e){}}
+loadConfig();
+
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelector('.screens').scrollTop=0;}
+function unitLabel(u){return u==='case'?'case(s)':'lbs';}
+function productByCode(c){return STATE.products.find(p=>p.code===c);}
+function agencyByNumber(n){return STATE.agencies.find(a=>a.number===String(n).trim());}
+function effectiveLimit(agencyNum,code){
+  const a=agencyByNumber(agencyNum);
+  if(a&&a.limits&&a.limits[code]>0)return a.limits[code];
+  const p=productByCode(code);return p&&p.limit>0?p.limit:0;
+}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500);}
+
+const cart=[]; let currentCode=null, editIndex=null, sigDataUrl=null, lastOrder=null;
+
+const visitDate=$('visitDate'); visitDate.valueAsDate=new Date();
+function applySubtitle(){$('subbar').textContent=STATE.settings.subtitle;}
+function applyHint(){$('agencyHint').innerHTML='Demo numbers that auto-fill: <b>'+STATE.agencies.map(a=>a.number).join(', ')+'</b>';}
+function checkIntake(){
+  const ok=$('agencyNum').value.trim()&&$('agencyName').value.trim()&&$('firstName').value.trim()&&$('lastName').value.trim()&&visitDate.value;
+  $('toScan').disabled=!ok;
+}
+['agencyName','firstName','lastName'].forEach(id=>$(id).addEventListener('input',checkIntake));
+visitDate.addEventListener('input',checkIntake);
+$('agencyNum').addEventListener('input',e=>{
+  const a=agencyByNumber(e.target.value);const f=$('agencyName');
+  if(a){f.value=a.name;f.setAttribute('readonly','');$('agencyFlag').classList.add('show');}
+  else{f.removeAttribute('readonly');$('agencyFlag').classList.remove('show');
+    if(STATE.agencies.some(x=>x.name===f.value))f.value='';}
+  checkIntake();
+});
+$('toScan').addEventListener('click',()=>{buildTags();show('s-scan');});
+
+function buildTags(){
+  const grid=$('tagGrid');grid.innerHTML='';
+  STATE.products.forEach(p=>{
+    const d=document.createElement('div');d.className='tag';
+    d.innerHTML=`<span class="emo">${p.emo||'📦'}</span><div class="nm">${p.name}</div><div class="cd">${p.code}</div>
+      <span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?'By the case':'By the pound'}</span>`;
+    d.addEventListener('click',()=>openItem(p.code));
+    grid.appendChild(d);
+  });
+  updateScanCount();
+}
+function updateScanCount(){$('scanCount').textContent=cart.length;}
+$('toCartFromScan').addEventListener('click',()=>{renderCart();show('s-cart');});
+
+function cartQtyForCode(code,exclude){return cart.reduce((s,it,i)=>(it.code===code&&i!==exclude?s+it.qty:s),0);}
+function openItem(code,idx=null){
+  currentCode=code;editIndex=idx;const p=productByCode(code);
+  $('itemEmo').textContent=p.emo||'📦';$('itemName').textContent=p.name;
+  $('qtyUnit').textContent=unitLabel(p.unit);
+  $('itemChip').innerHTML=`<span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?'Picked by the case':'Picked by the pound'}</span>`;
+  $('entryHelp').textContent=p.unit==='case'?'Count the cases you are taking and enter the number.':'Weigh the item on the scale, then enter the total pounds.';
+  const lim=effectiveLimit($('agencyNum').value,code);
+  const lb=$('limitBanner');
+  if(lim>0){lb.style.display='block';lb.textContent=`Limit for your agency: ${lim} ${unitLabel(p.unit)}`;}
+  else{lb.style.display='none';}
+  $('qtyInput').value=idx!==null?cart[idx].qty:'';
+  $('qtyWarn').classList.remove('show');$('qtyInput').style.borderColor='';
+  show('s-item');setTimeout(()=>$('qtyInput').focus(),50);
+}
+$('qMinus').addEventListener('click',()=>{const i=$('qtyInput');i.value=Math.max(0,(parseFloat(i.value)||0)-1);});
+$('qPlus').addEventListener('click',()=>{const i=$('qtyInput');i.value=(parseFloat(i.value)||0)+1;});
+$('itemBack').addEventListener('click',()=>show('s-scan'));
+$('cancelItem').addEventListener('click',()=>show('s-scan'));
+$('addItem').addEventListener('click',()=>{
+  const qty=parseFloat($('qtyInput').value);const p=productByCode(currentCode);
+  const warn=$('qtyWarn');
+  if(!(qty>0)){$('qtyInput').focus();$('qtyInput').style.borderColor='var(--orange)';warn.textContent='Please enter a quantity greater than 0.';warn.classList.add('show');return;}
+  const lim=effectiveLimit($('agencyNum').value,currentCode);
+  const combined=cartQtyForCode(currentCode,editIndex)+qty;
+  if(lim>0&&combined>lim){
+    warn.textContent=`That brings your ${p.name} to ${combined} ${unitLabel(p.unit)}, over the ${lim} ${unitLabel(p.unit)} limit. Please reduce the amount.`;
+    warn.classList.add('show');$('qtyInput').style.borderColor='var(--orange)';return;
+  }
+  warn.classList.remove('show');
+  if(editIndex!==null)cart[editIndex].qty=qty;
+  else cart.push({code:currentCode,name:p.name,emo:p.emo||'📦',unit:p.unit,qty});
+  updateScanCount();renderCart();show('s-cart');
+});
+
+function renderCart(){
+  const list=$('cartList');list.innerHTML='';
+  if(cart.length===0)list.innerHTML='<div class="empty">No items yet.<br>Scan a shelf tag to begin.</div>';
+  cart.forEach((it,idx)=>{
+    const d=document.createElement('div');d.className='cart-item';
+    d.innerHTML=`<span class="emo">${it.emo}</span><div class="info"><div class="nm">${it.name}</div><div class="q">${it.qty} ${unitLabel(it.unit)} · ${it.code}</div></div><button class="rm">Remove</button>`;
+    d.querySelector('.info').addEventListener('click',()=>openItem(it.code,idx));
+    d.querySelector('.rm').addEventListener('click',e=>{e.stopPropagation();cart.splice(idx,1);updateScanCount();renderCart();});
+    list.appendChild(d);
+  });
+  $('toSign').disabled=cart.length===0;
+  $('cartLead').textContent=cart.length?"Review what you've picked up. Tap an item to edit, or Remove to delete.":"Your log is empty — scan a shelf tag to add items.";
+}
+$('cartBack').addEventListener('click',()=>show('s-scan'));
+$('addMore').addEventListener('click',()=>show('s-scan'));
+$('toSign').addEventListener('click',()=>{buildSummary('signSummary');show('s-sign');initSig();});
+
+function fmtDate(){return new Date(visitDate.value+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function buildSummary(targetId){
+  let r=`<div class="r"><span class="k">Agency</span><span class="v">${$('agencyName').value} (#${$('agencyNum').value})</span></div>
+    <div class="r"><span class="k">Picked up by</span><span class="v">${$('firstName').value} ${$('lastName').value}</span></div>
+    <div class="r"><span class="k">Date</span><span class="v">${fmtDate()}</span></div>
+    <div class="r" style="border-top:1px solid var(--green-line);margin-top:6px;padding-top:8px"><span class="k">Items</span><span class="v">${cart.length}</span></div>`;
+  cart.forEach(it=>r+=`<div class="r"><span class="k">${it.emo} ${it.name}</span><span class="v">${it.qty} ${unitLabel(it.unit)}</span></div>`);
+  $(targetId).innerHTML=r;
+}
+
+let sigCtx,drawing=false;
+function initSig(){
+  const c=$('sigPad');const rect=c.getBoundingClientRect();
+  c.width=rect.width*2;c.height=rect.height*2;sigCtx=c.getContext('2d');sigCtx.scale(2,2);
+  sigCtx.lineWidth=2.2;sigCtx.lineCap='round';sigCtx.strokeStyle='#234716';
+  sigDataUrl=null;$('submitBtn').disabled=true;
+  const pos=e=>{const r=c.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};};
+  const start=e=>{drawing=true;const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);e.preventDefault();};
+  const move=e=>{if(!drawing)return;const p=pos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();$('submitBtn').disabled=false;e.preventDefault();};
+  const end=()=>{drawing=false;};
+  c.onmousedown=start;c.onmousemove=move;window.onmouseup=end;
+  c.ontouchstart=start;c.ontouchmove=move;c.ontouchend=end;
+}
+$('sigClear').addEventListener('click',()=>{if(sigCtx)sigCtx.clearRect(0,0,$('sigPad').width,$('sigPad').height);sigDataUrl=null;$('submitBtn').disabled=true;});
+$('signBack').addEventListener('click',()=>{renderCart();show('s-cart');});
+
+$('submitBtn').addEventListener('click',()=>{
+  sigDataUrl=$('sigPad').toDataURL('image/png');
+  const agency=agencyByNumber($('agencyNum').value);
+  lastOrder={
+    ord:'#SH-'+String(Math.floor(100000+Math.random()*900000)),
+    agencyName:$('agencyName').value,agencyNum:$('agencyNum').value,
+    agencyEmail:agency?agency.email:'',
+    picker:$('firstName').value+' '+$('lastName').value,
+    date:fmtDate(),items:cart.map(it=>({...it})),sig:sigDataUrl
+  };
+  $('ordNum').textContent=lastOrder.ord;
+  const recips=[STATE.settings.orgEmail];if(lastOrder.agencyEmail)recips.push(lastOrder.agencyEmail);
+  $('emailPill').innerHTML='✉ Confirmation emailed to <b>'+recips.join('</b> and <b>')+'</b>';
+  buildSummary('doneSummary');
+  show('s-done');
+});
+
+function emailHTML(o){
+  let rows=o.items.map(it=>`<tr><td>${it.emo} ${it.name}</td><td>${it.code}</td><td class="num">${it.qty} ${unitLabel(it.unit)}</td></tr>`).join('');
+  return `<div class="email-meta"><b>To:</b> ${STATE.settings.orgEmail}${o.agencyEmail?', '+o.agencyEmail:''}<br>
+    <b>From:</b> Second Harvest of Silicon Valley &lt;noreply@shfb.org&gt;<br>
+    <b>Subject:</b> Pickup confirmation ${o.ord} — ${o.agencyName}</div>
+    <h3 class="email-h">Pickup confirmed ✓</h3>
+    <p style="font-size:13px;color:#555;margin:0 0 6px">Confirmation <b>${o.ord}</b> · ${o.date}</p>
+    <p style="font-size:13px;color:#555;margin:0"><b>${o.agencyName}</b> (#${o.agencyNum})<br>Picked up by ${o.picker}</p>
+    <table class="lines"><thead><tr><th>Item</th><th>Code</th><th style="text-align:right">Quantity</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="sig-block"><div class="sl">Signature on file</div><img src="${o.sig}" alt="signature"></div>
+    <p style="font-size:11px;color:#999;margin-top:16px">Thank you for partnering with Second Harvest of Silicon Valley to end local hunger.</p>`;
+}
+$('previewEmail').addEventListener('click',()=>{$('emailBody').innerHTML=emailHTML(lastOrder);$('emailModal').classList.add('show');});
+$('closeEmail').addEventListener('click',()=>$('emailModal').classList.remove('show'));
+$('emailModal').addEventListener('click',e=>{if(e.target.id==='emailModal')$('emailModal').classList.remove('show');});
+
+function invoiceHTML(o){
+  let rows=o.items.map(it=>`<tr><td>${it.name}</td><td>${it.code}</td><td>${it.unit==='case'?'Case':'Pound'}</td><td class="n">${it.qty} ${unitLabel(it.unit)}</td></tr>`).join('');
+  return `<div class="inv-head">
+      <div class="org">Second Harvest<small>OF SILICON VALLEY</small></div>
+      <h1>FOOD PICKUP INVOICE<br>${o.ord}</h1></div>
+    <div class="meta">
+      <div><b>Agency</b>${o.agencyName}<br>#${o.agencyNum}${o.agencyEmail?'<br>'+o.agencyEmail:''}</div>
+      <div><b>Picked up by</b>${o.picker}</div>
+      <div><b>Date</b>${o.date}</div></div>
+    <table><thead><tr><th>Item</th><th>Code</th><th>Unit</th><th style="text-align:right">Quantity</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="sig"><img src="${o.sig}" alt="signature"><div class="cap">Authorized signature — ${o.picker}, ${o.agencyName}</div></div>
+    <div class="ftr">Second Harvest of Silicon Valley · Ending hunger in our community · This invoice confirms the food quantities received above.</div>`;
+}
+$('printInv').addEventListener('click',()=>{
+  $('printArea').innerHTML=invoiceHTML(lastOrder);
+  document.body.classList.add('printing');
+  window.print();
+});
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing'));
+
+$('newSession').addEventListener('click',()=>{
+  cart.length=0;currentCode=null;editIndex=null;sigDataUrl=null;
+  $('agencyNum').value='';$('agencyName').value='';$('agencyName').removeAttribute('readonly');
+  $('agencyFlag').classList.remove('show');$('firstName').value='';$('lastName').value='';
+  visitDate.valueAsDate=new Date();checkIntake();updateScanCount();show('s-intake');
+});
+
+// ================= ADMIN =================
+$('gearBtn').addEventListener('click',()=>{$('adminPin').value='';$('pinWarn').classList.remove('show');show('s-admin-login');});
+$('adminLoginBack').addEventListener('click',()=>show('s-intake'));
+$('adminLoginBtn').addEventListener('click',()=>{
+  if($('adminPin').value===STATE.settings.pin){renderAdmin();show('s-admin');}
+  else $('pinWarn').classList.add('show');
+});
+$('adminExit').addEventListener('click',()=>{applySubtitle();applyHint();show('s-intake');});
+
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$('tab-'+b.dataset.tab).classList.add('on');
+}));
+
+function renderAdmin(){renderProducts();renderAgencies();
+  $('setOrgEmail').value=STATE.settings.orgEmail;$('setSubtitle').value=STATE.settings.subtitle;$('setPin').value=STATE.settings.pin;}
+
+function renderProducts(){
+  const c=$('prodList');c.innerHTML='';
+  STATE.products.forEach((p,i)=>{
+    const card=document.createElement('div');card.className='cfg-card';
+    card.innerHTML=`<div class="top"><span class="ttl">${p.emo||'📦'} ${p.name||'New item'}</span><button class="del">Delete</button></div>
+      <div class="grid">
+        <div><label>Name</label><input class="pn" type="text" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Code (QR)</label><input class="pc" type="text" value="${p.code||''}"></div>
+        <div><label>Unit</label><select class="pu"><option value="lbs"${p.unit==='lbs'?' selected':''}>Pounds (lbs)</option><option value="case"${p.unit==='case'?' selected':''}>Cases</option></select></div>
+        <div><label>Limit qty (0 = none)</label><input class="pl" type="number" min="0" value="${p.limit||0}"></div>
+        <div><label>Icon</label><input class="pe" type="text" value="${p.emo||''}" maxlength="2"></div>
+      </div>`;
+    card.querySelector('.del').addEventListener('click',()=>{STATE.products.splice(i,1);renderProducts();});
+    c.appendChild(card);
+  });
+}
+function readProducts(){
+  const cards=$('prodList').querySelectorAll('.cfg-card');const arr=[];
+  cards.forEach(cd=>{arr.push({
+    name:cd.querySelector('.pn').value.trim()||'Untitled',
+    code:cd.querySelector('.pc').value.trim()||('PRD-'+Math.floor(100+Math.random()*900)),
+    unit:cd.querySelector('.pu').value,
+    limit:parseFloat(cd.querySelector('.pl').value)||0,
+    emo:cd.querySelector('.pe').value.trim()||'📦'
+  });});
+  return arr;
+}
+$('addProd').addEventListener('click',()=>{STATE.products.push({code:'',name:'',emo:'📦',unit:'lbs',limit:0});renderProducts();
+  $('prodList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
+$('saveProd').addEventListener('click',()=>{STATE.products=readProducts();saveConfig();renderProducts();toast('Items saved ✓');});
+
+function renderAgencies(){
+  const c=$('agcyList');c.innerHTML='';
+  STATE.agencies.forEach((a,i)=>{
+    const card=document.createElement('div');card.className='cfg-card';
+    const ov=STATE.products.map(p=>{
+      const val=(a.limits&&a.limits[p.code])?a.limits[p.code]:'';
+      return `<div class="ov-row"><span class="ovn">${p.emo||'📦'} ${p.name}</span><input class="ovi" data-code="${p.code}" type="number" min="0" placeholder="${p.limit||'—'}" value="${val}"><span class="du">${unitLabel(p.unit)}</span></div>`;
+    }).join('');
+    card.innerHTML=`<div class="top"><span class="ttl">${a.name||'New agency'}</span><button class="del">Delete</button></div>
+      <div class="grid">
+        <div><label>Agency #</label><input class="an" type="text" value="${a.number||''}"></div>
+        <div><label>Name</label><input class="am" type="text" value="${(a.name||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <label>Confirmation email</label><input class="ae" type="email" value="${a.email||''}">
+      <button class="ov-toggle">⚙ Per-item limits (overrides) ▾</button>
+      <div class="ov-panel"><div class="mini">Blank = use the item's default limit (shown as placeholder).</div>${ov}</div>`;
+    card.querySelector('.del').addEventListener('click',()=>{STATE.agencies.splice(i,1);renderAgencies();});
+    const tg=card.querySelector('.ov-toggle');tg.addEventListener('click',()=>card.querySelector('.ov-panel').classList.toggle('show'));
+    c.appendChild(card);
+  });
+}
+function readAgencies(){
+  const cards=$('agcyList').querySelectorAll('.cfg-card');const arr=[];
+  cards.forEach(cd=>{
+    const limits={};
+    cd.querySelectorAll('.ovi').forEach(inp=>{const v=parseFloat(inp.value);if(v>0)limits[inp.dataset.code]=v;});
+    arr.push({number:cd.querySelector('.an').value.trim(),name:cd.querySelector('.am').value.trim()||'Untitled',
+      email:cd.querySelector('.ae').value.trim(),limits});
+  });
+  return arr;
+}
+$('addAgcy').addEventListener('click',()=>{STATE.agencies.push({number:'',name:'',email:'',limits:{}});renderAgencies();
+  $('agcyList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
+$('saveAgcy').addEventListener('click',()=>{STATE.agencies=readAgencies();saveConfig();renderAgencies();toast('Agencies saved ✓');});
+
+$('saveSettings').addEventListener('click',()=>{
+  STATE.settings.orgEmail=$('setOrgEmail').value.trim();
+  STATE.settings.subtitle=$('setSubtitle').value.trim()||'Partner Agency Shopping Log';
+  STATE.settings.pin=$('setPin').value.trim()||'1234';
+  saveConfig();applySubtitle();applyHint();toast('Settings saved ✓');
+});
+$('resetCfg').addEventListener('click',()=>{
+  if(confirm('Reset all items, agencies, and settings to demo defaults?')){
+    STATE=structuredClone(DEFAULTS);saveConfig();renderAdmin();applySubtitle();applyHint();toast('Reset to defaults ✓');
+  }
+});
+
+// ---------- Excel import / export ----------
+function rowGet(r,aliases){
+  const map={};Object.keys(r).forEach(k=>map[String(k).toLowerCase().trim()]=r[k]);
+  for(const a of aliases){const v=map[a.toLowerCase()];if(v!==undefined&&String(v).trim()!=='')return v;}
+  return '';
+}
+const CORE_AGCY=['agency number','number','agency #','agencynumber','agency name','name','agency','email','confirmation email','e-mail'];
+
+$('tplProd').addEventListener('click',()=>{
+  if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — please try again in a moment.');return;}
+  const rows=[['Name','Code','Unit','Limit','Icon']];
+  STATE.products.forEach(p=>rows.push([p.name,p.code,p.unit,p.limit||0,p.emo||'']));
+  if(STATE.products.length===0){rows.push(['Oranges','PRD-001','lbs',30,'🍊']);rows.push(['Eggs','PRD-006','case',2,'🥚']);}
+  const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Items');XLSX.writeFile(wb,'shfb-items-template.xlsx');
+});
+$('impProd').addEventListener('click',()=>$('fileProd').click());
+$('fileProd').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      const items=rows.map(r=>({
+        name:String(rowGet(r,['Name','Item','Product'])).trim(),
+        code:String(rowGet(r,['Code','QR','SKU'])).trim(),
+        unit:String(rowGet(r,['Unit','UOM'])).toLowerCase().startsWith('case')?'case':'lbs',
+        limit:parseFloat(rowGet(r,['Limit','Limit Qty','Max']))||0,
+        emo:String(rowGet(r,['Icon','Emoji'])).trim()||'📦'
+      })).filter(x=>x.name);
+      items.forEach(x=>{if(!x.code)x.code='PRD-'+Math.floor(100+Math.random()*900);});
+      if(!items.length){alert('No item rows found. Make sure your sheet has a "Name" column.');}
+      else if(confirm('Replace all '+STATE.products.length+' items with '+items.length+' item(s) from this file?')){
+        STATE.products=items;saveConfig();renderProducts();renderAgencies();toast('Imported '+items.length+' items ✓');
+      }
+    }catch(err){alert('Could not read that file: '+err.message);}
+    $('fileProd').value='';
+  };
+  rd.readAsArrayBuffer(f);
+});
+
+$('tplAgcy').addEventListener('click',()=>{
+  if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — please try again in a moment.');return;}
+  const ovHeaders=STATE.products.map(p=>`Limit: ${p.name} (${p.code})`);
+  const header=['Agency Number','Agency Name','Email',...ovHeaders];
+  const rows=[header];
+  STATE.agencies.forEach(a=>{
+    rows.push([a.number,a.name,a.email].concat(
+      STATE.products.map(p=>(a.limits&&a.limits[p.code])?a.limits[p.code]:'')));
+  });
+  if(STATE.agencies.length===0)rows.push(['1042','Sacred Heart Community Service','pantry@sacredheartcs.org',...STATE.products.map(()=>'')]);
+  const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Agencies');XLSX.writeFile(wb,'shfb-agencies-template.xlsx');
+});
+$('impAgcy').addEventListener('click',()=>$('fileAgcy').click());
+$('fileAgcy').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      const agencies=rows.map(r=>{
+        const number=String(rowGet(r,['Agency Number','Number','Agency #','AgencyNumber'])).trim();
+        const name=String(rowGet(r,['Agency Name','Name','Agency'])).trim();
+        const email=String(rowGet(r,['Email','Confirmation Email','E-mail'])).trim();
+        const limits={};
+        Object.keys(r).forEach(k=>{
+          const kl=String(k).toLowerCase().trim();
+          if(CORE_AGCY.includes(kl))return;
+          const val=parseFloat(r[k]);if(!(val>0))return;
+          const p=STATE.products.find(p=>String(k).includes(p.code)||kl.includes(p.name.toLowerCase()));
+          if(p)limits[p.code]=val;
+        });
+        return {number,name,email,limits};
+      }).filter(a=>a.name||a.number);
+      if(!agencies.length){alert('No agency rows found. Make sure your sheet has "Agency Number" and "Agency Name" columns.');}
+      else if(confirm('Replace all '+STATE.agencies.length+' agencies with '+agencies.length+' agency(ies) from this file?')){
+        STATE.agencies=agencies;saveConfig();renderAgencies();applyHint();toast('Imported '+agencies.length+' agencies ✓');
+      }
+    }catch(err){alert('Could not read that file: '+err.message);}
+    $('fileAgcy').value='';
+  };
+  rd.readAsArrayBuffer(f);
+});
+
+// ---------- Init ----------
+applySubtitle();applyHint();checkIntake();renderCart();
+</script>
+</body>
+</html>
