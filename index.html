@@ -186,8 +186,6 @@
 </head>
 <body>
 <div class="phone">
-  <div class="statusbar"><span>9:41</span><span class="dots">●●● ⌃ 100%</span></div>
-
   <header class="app">
     <div class="brand">
       <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true">
@@ -231,9 +229,11 @@
     <section class="screen" id="s-scan">
       <h2 class="title">Scan a shelf tag</h2>
       <p class="lead">Point your camera at the QR code on the product's shelf tag.</p>
-      <div class="scanner"><div class="reticle"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div><div class="scanline"></div></div>
-      <div class="scan-cap">Searching for a code…</div>
-      <div class="demo-note">📱 <b>Demo:</b> a real device reads the QR automatically. Tap any shelf tag below to simulate a scan.</div>
+      <div id="qrReader" style="width:100%;border-radius:18px;overflow:hidden;display:none;margin-bottom:8px"></div>
+      <div class="scanner" id="scanPlaceholder"><div class="reticle"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div><div class="scanline"></div></div>
+      <div class="scan-cap" id="scanStatus">Tap “Start camera” to scan a QR code.</div>
+      <div class="stack"><button class="btn btn-primary" id="startCam">📷 Start camera</button><button class="btn btn-ghost" id="stopCam" style="display:none">Stop camera</button></div>
+      <div class="demo-note" style="margin-top:12px">No camera? Tap a shelf tag below to enter an item manually.</div>
       <div class="tag-grid" id="tagGrid"></div>
       <div class="stack" style="margin-top:14px"><button class="btn btn-ghost" id="toCartFromScan">Review cart (<span id="scanCount">0</span>)</button></div>
     </section>
@@ -300,6 +300,7 @@
       <div class="tabs">
         <button data-tab="products" class="on">Items</button>
         <button data-tab="agencies">Agencies</button>
+        <button data-tab="orders">Orders</button>
         <button data-tab="settings">Settings</button>
       </div>
       <div class="tabpane on" id="tab-products">
@@ -324,11 +325,23 @@
         <button class="btn btn-ghost btn-sm" id="addAgcy">+ Add agency</button>
         <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveAgcy">Save agencies</button></div>
       </div>
+      <div class="tabpane" id="tab-orders">
+        <p class="mini">Every submitted pickup is saved on this device. Export the end-of-day file or push it to Google Sheets.</p>
+        <div class="summary-card" id="ordersStat"></div>
+        <div class="stack">
+          <button class="btn btn-primary" id="exportCsv">⬇ Export end-of-day CSV</button>
+          <button class="btn btn-ghost btn-sm" id="pushSheets">↗ Send all to Google Sheets</button>
+          <button class="btn btn-ghost btn-sm" id="clearOrders">Clear saved orders</button>
+        </div>
+        <div id="ordersList" style="margin-top:12px"></div>
+      </div>
       <div class="tabpane" id="tab-settings">
         <p class="mini">Where pickup confirmations are sent. The agency's own email also receives a copy.</p>
         <div class="cfg-card">
           <label>Warehouse / org confirmation email</label>
           <input type="email" id="setOrgEmail">
+          <label>Google Sheets web app URL (Apps Script)</label>
+          <input type="text" id="setSheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
           <label>App subtitle</label>
           <input type="text" id="setSubtitle">
           <label>Admin PIN</label>
@@ -354,6 +367,7 @@
 <div id="printArea"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 // ---------- Persistent config ----------
 const LS_KEY='shfb_config_v1';
@@ -375,15 +389,23 @@ const DEFAULTS={
     {number:'4023',name:"Martha's Kitchen",email:'orders@marthas-kitchen.org',limits:{}},
     {number:'5120',name:"St. Joseph's Family Center",email:'pantry@sjfc.org',limits:{}}
   ],
-  settings:{orgEmail:'warehouse@shfb.org',subtitle:'Partner Agency Shopping Log',pin:'1234'}
+  settings:{orgEmail:'warehouse@shfb.org',subtitle:'Partner Agency Shopping Log',pin:'1234',sheetUrl:''}
 };
 let STATE;
 function loadConfig(){
   try{const raw=localStorage.getItem(LS_KEY); STATE=raw?JSON.parse(raw):structuredClone(DEFAULTS);}
   catch(e){STATE=structuredClone(DEFAULTS);}
+  if(STATE.settings.sheetUrl===undefined)STATE.settings.sheetUrl='';
 }
 function saveConfig(){try{localStorage.setItem(LS_KEY,JSON.stringify(STATE));}catch(e){}}
 loadConfig();
+
+// ---------- Saved orders (separate store, survives config reset) ----------
+const ORD_KEY='shfb_orders_v1';
+let ORDERS=[];
+function loadOrders(){try{const r=localStorage.getItem(ORD_KEY);ORDERS=r?JSON.parse(r):[];}catch(e){ORDERS=[];}}
+function saveOrders(){try{localStorage.setItem(ORD_KEY,JSON.stringify(ORDERS));}catch(e){}}
+loadOrders();
 
 const $=id=>document.getElementById(id);
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelector('.screens').scrollTop=0;}
@@ -429,7 +451,37 @@ function buildTags(){
   updateScanCount();
 }
 function updateScanCount(){$('scanCount').textContent=cart.length;}
-$('toCartFromScan').addEventListener('click',()=>{renderCart();show('s-cart');});
+$('toCartFromScan').addEventListener('click',()=>{stopScanner();renderCart();show('s-cart');});
+
+// ---------- Camera QR scanning ----------
+let qrScanner=null;
+function startScanner(){
+  if(typeof Html5Qrcode==='undefined'){$('scanStatus').textContent='Camera library not loaded — use the tags below.';return;}
+  $('qrReader').style.display='block';$('scanPlaceholder').style.display='none';
+  $('startCam').style.display='none';$('stopCam').style.display='block';
+  $('scanStatus').textContent='Point the camera at a shelf-tag QR code…';
+  qrScanner=new Html5Qrcode('qrReader');
+  qrScanner.start({facingMode:'environment'},{fps:10,qrbox:200},onScan,()=>{}).catch(err=>{
+    $('scanStatus').textContent='Could not start camera ('+err+'). Use the tags below instead.';
+    $('qrReader').style.display='none';$('scanPlaceholder').style.display='flex';
+    $('startCam').style.display='block';$('stopCam').style.display='none';qrScanner=null;
+  });
+}
+function stopScanner(){
+  if(qrScanner){const s=qrScanner;qrScanner=null;s.stop().then(()=>s.clear()).catch(()=>{});}
+  $('qrReader').style.display='none';$('scanPlaceholder').style.display='flex';
+  $('startCam').style.display='block';$('stopCam').style.display='none';
+  $('scanStatus').textContent='Tap “Start camera” to scan a QR code.';
+}
+function onScan(text){
+  let code=String(text).trim();
+  const m=code.match(/[?&]code=([^&]+)/);if(m)code=decodeURIComponent(m[1]);
+  const p=productByCode(code)||STATE.products.find(x=>x.code.toLowerCase()===code.toLowerCase());
+  if(p){stopScanner();openItem(p.code);}
+  else{$('scanStatus').textContent='Unrecognized code: '+code;}
+}
+$('startCam').addEventListener('click',startScanner);
+$('stopCam').addEventListener('click',stopScanner);
 
 function cartQtyForCode(code,exclude){return cart.reduce((s,it,i)=>(it.code===code&&i!==exclude?s+it.qty:s),0);}
 function openItem(code,idx=null){
@@ -522,6 +574,9 @@ $('submitBtn').addEventListener('click',()=>{
   $('ordNum').textContent=lastOrder.ord;
   const recips=[STATE.settings.orgEmail];if(lastOrder.agencyEmail)recips.push(lastOrder.agencyEmail);
   $('emailPill').innerHTML='✉ Confirmation emailed to <b>'+recips.join('</b> and <b>')+'</b>';
+  const {sig,...orderNoSig}=lastOrder;
+  ORDERS.push({...orderNoSig,ts:new Date().toISOString()});
+  saveOrders();
   buildSummary('doneSummary');
   show('s-done');
 });
@@ -557,8 +612,11 @@ function invoiceHTML(o){
 }
 $('printInv').addEventListener('click',()=>{
   $('printArea').innerHTML=invoiceHTML(lastOrder);
-  document.body.classList.add('printing');
-  window.print();
+  const img=$('printArea').querySelector('img');
+  let done=false;
+  const go=()=>{if(done)return;done=true;document.body.classList.add('printing');window.print();};
+  if(img&&!img.complete){img.onload=go;img.onerror=go;setTimeout(go,700);}
+  else go();
 });
 window.addEventListener('afterprint',()=>document.body.classList.remove('printing'));
 
@@ -570,7 +628,7 @@ $('newSession').addEventListener('click',()=>{
 });
 
 // ================= ADMIN =================
-$('gearBtn').addEventListener('click',()=>{$('adminPin').value='';$('pinWarn').classList.remove('show');show('s-admin-login');});
+$('gearBtn').addEventListener('click',()=>{stopScanner();$('adminPin').value='';$('pinWarn').classList.remove('show');show('s-admin-login');});
 $('adminLoginBack').addEventListener('click',()=>show('s-intake'));
 $('adminLoginBtn').addEventListener('click',()=>{
   if($('adminPin').value===STATE.settings.pin){renderAdmin();show('s-admin');}
@@ -584,8 +642,9 @@ document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',
   b.classList.add('on');$('tab-'+b.dataset.tab).classList.add('on');
 }));
 
-function renderAdmin(){renderProducts();renderAgencies();
-  $('setOrgEmail').value=STATE.settings.orgEmail;$('setSubtitle').value=STATE.settings.subtitle;$('setPin').value=STATE.settings.pin;}
+function renderAdmin(){renderProducts();renderAgencies();renderOrders();
+  $('setOrgEmail').value=STATE.settings.orgEmail;$('setSheetUrl').value=STATE.settings.sheetUrl||'';
+  $('setSubtitle').value=STATE.settings.subtitle;$('setPin').value=STATE.settings.pin;}
 
 function renderProducts(){
   const c=$('prodList');c.innerHTML='';
@@ -655,9 +714,57 @@ $('saveAgcy').addEventListener('click',()=>{STATE.agencies=readAgencies();saveCo
 
 $('saveSettings').addEventListener('click',()=>{
   STATE.settings.orgEmail=$('setOrgEmail').value.trim();
+  STATE.settings.sheetUrl=$('setSheetUrl').value.trim();
   STATE.settings.subtitle=$('setSubtitle').value.trim()||'Partner Agency Shopping Log';
   STATE.settings.pin=$('setPin').value.trim()||'1234';
   saveConfig();applySubtitle();applyHint();toast('Settings saved ✓');
+});
+
+// ---------- Orders: list, CSV export, Google Sheets push ----------
+function ordersToRows(){
+  const rows=[];
+  ORDERS.forEach(o=>o.items.forEach(it=>rows.push({
+    confirmation:o.ord,timestamp:o.ts,date:o.date,agencyNumber:o.agencyNum,agencyName:o.agencyName,
+    pickedUpBy:o.picker,item:it.name,code:it.code,unit:it.unit,quantity:it.qty})));
+  return rows;
+}
+function renderOrders(){
+  const lines=ORDERS.reduce((s,o)=>s+o.items.length,0);
+  $('ordersStat').innerHTML=`<div class="r"><span class="k">Saved orders</span><span class="v">${ORDERS.length}</span></div>
+    <div class="r"><span class="k">Total line items</span><span class="v">${lines}</span></div>`;
+  const list=$('ordersList');list.innerHTML='';
+  if(!ORDERS.length){list.innerHTML='<div class="empty">No pickups submitted yet on this device.</div>';return;}
+  ORDERS.slice().reverse().forEach(o=>{
+    const d=document.createElement('div');d.className='cart-item';
+    d.innerHTML=`<div class="info"><div class="nm">${o.ord} · ${o.agencyName}</div><div class="q">${o.date} · ${o.picker} · ${o.items.length} item(s)</div></div>`;
+    list.appendChild(d);
+  });
+}
+$('exportCsv').addEventListener('click',()=>{
+  if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — try again in a moment.');return;}
+  const rows=ordersToRows();
+  if(!rows.length){alert('No saved orders to export.');return;}
+  const head=['Confirmation','Timestamp','Date','Agency #','Agency Name','Picked up by','Item','Code','Unit','Quantity'];
+  const aoa=[head,...rows.map(r=>[r.confirmation,r.timestamp,r.date,r.agencyNumber,r.agencyName,r.pickedUpBy,r.item,r.code,r.unit,r.quantity])];
+  const ws=XLSX.utils.aoa_to_sheet(aoa);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Orders');
+  XLSX.writeFile(wb,'shfb-orders-'+new Date().toISOString().slice(0,10)+'.csv',{bookType:'csv'});
+});
+$('pushSheets').addEventListener('click',async()=>{
+  const url=STATE.settings.sheetUrl;
+  if(!url){alert('Add your Google Sheets web app URL in Settings first.');return;}
+  const rows=ordersToRows();
+  if(!rows.length){alert('No saved orders to send.');return;}
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({rows})});
+    toast('Sent '+rows.length+' rows to Google Sheets ✓');
+  }catch(err){alert('Could not reach Google Sheets: '+err.message);}
+});
+$('clearOrders').addEventListener('click',()=>{
+  if(!ORDERS.length){alert('No saved orders.');return;}
+  if(confirm('Clear all '+ORDERS.length+' saved orders from this device? Export them first if you need them.')){
+    ORDERS.length=0;saveOrders();renderOrders();toast('Orders cleared ✓');
+  }
 });
 $('resetCfg').addEventListener('click',()=>{
   if(confirm('Reset all items, agencies, and settings to demo defaults?')){
