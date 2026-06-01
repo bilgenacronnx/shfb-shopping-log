@@ -329,7 +329,7 @@
         <p class="mini">Every submitted pickup is saved on this device. Export the end-of-day file or push it to Google Sheets.</p>
         <div class="summary-card" id="ordersStat"></div>
         <div class="stack">
-          <button class="btn btn-primary" id="exportCsv">⬇ Export end-of-day CSV</button>
+          <button class="btn btn-primary" id="exportCsv">⬇ Export end-of-day file (.xlsx)</button>
           <button class="btn btn-ghost btn-sm" id="pushSheets">↗ Send all to Google Sheets</button>
           <button class="btn btn-ghost btn-sm" id="clearOrders">Clear saved orders</button>
         </div>
@@ -574,6 +574,7 @@ $('submitBtn').addEventListener('click',()=>{
   $('ordNum').textContent=lastOrder.ord;
   const recips=[STATE.settings.orgEmail];if(lastOrder.agencyEmail)recips.push(lastOrder.agencyEmail);
   $('emailPill').innerHTML='✉ Confirmation emailed to <b>'+recips.join('</b> and <b>')+'</b>';
+  cloudPost({action:'order',order:lastOrder});
   const {sig,...orderNoSig}=lastOrder;
   ORDERS.push({...orderNoSig,ts:new Date().toISOString()});
   saveOrders();
@@ -675,7 +676,7 @@ function readProducts(){
 }
 $('addProd').addEventListener('click',()=>{STATE.products.push({code:'',name:'',emo:'📦',unit:'lbs',limit:0});renderProducts();
   $('prodList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
-$('saveProd').addEventListener('click',()=>{STATE.products=readProducts();saveConfig();renderProducts();toast('Items saved ✓');});
+$('saveProd').addEventListener('click',()=>{STATE.products=readProducts();saveConfig();renderProducts();cloudPost({action:'saveItems',items:STATE.products});toast('Items saved ✓');});
 
 function renderAgencies(){
   const c=$('agcyList');c.innerHTML='';
@@ -710,7 +711,7 @@ function readAgencies(){
 }
 $('addAgcy').addEventListener('click',()=>{STATE.agencies.push({number:'',name:'',email:'',limits:{}});renderAgencies();
   $('agcyList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
-$('saveAgcy').addEventListener('click',()=>{STATE.agencies=readAgencies();saveConfig();renderAgencies();toast('Agencies saved ✓');});
+$('saveAgcy').addEventListener('click',()=>{STATE.agencies=readAgencies();saveConfig();renderAgencies();cloudPost({action:'saveAgencies',agencies:STATE.agencies});toast('Agencies saved ✓');});
 
 $('saveSettings').addEventListener('click',()=>{
   STATE.settings.orgEmail=$('setOrgEmail').value.trim();
@@ -742,13 +743,50 @@ function renderOrders(){
 }
 $('exportCsv').addEventListener('click',()=>{
   if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — try again in a moment.');return;}
-  const rows=ordersToRows();
-  if(!rows.length){alert('No saved orders to export.');return;}
-  const head=['Confirmation','Timestamp','Date','Agency #','Agency Name','Picked up by','Item','Code','Unit','Quantity'];
-  const aoa=[head,...rows.map(r=>[r.confirmation,r.timestamp,r.date,r.agencyNumber,r.agencyName,r.pickedUpBy,r.item,r.code,r.unit,r.quantity])];
-  const ws=XLSX.utils.aoa_to_sheet(aoa);const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Orders');
-  XLSX.writeFile(wb,'shfb-orders-'+new Date().toISOString().slice(0,10)+'.csv',{bookType:'csv'});
+  if(!ORDERS.length){alert('No saved orders to export.');return;}
+  const prods=STATE.products, n=prods.length;
+  const FIRST=4;                       // column E (0-based) = first product column
+  const last=FIRST+n-1;                // last product column (0-based)
+  const START=6;                       // sheet row (1-based) where orders begin
+  const lastDataRow=START+ORDERS.length-1;
+  const col=i=>XLSX.utils.encode_col(i);
+  const width=Math.max(19,FIRST+n);
+  const R={}, formulas=[];
+  const ensure=r=>{if(!R[r])R[r]=new Array(width).fill(null);return R[r];};
+  const F=(r,c,f)=>formulas.push({r,c,f});
+
+  // Row 1 — org / location
+  let row=ensure(0); row[0]='Second Harvest of Silicon Valley'; row[7]='Location:';
+  // Row 2 — import metadata
+  row=ensure(1); row[0]='Grocery Rescue Import'; row[7]='Posting Date:'; row[8]=new Date().toLocaleDateString('en-US');
+  row[11]='AutoRelease:'; row[12]='Y'; row[18]='FBC Prod. Source/FBC Reason Code';
+  // Row 3 — Description + product names
+  row=ensure(2); row[3]='Description'; prods.forEach((p,j)=>row[FIRST+j]=p.name);
+  // Row 4 — column labels + product item numbers
+  row=ensure(3); row[0]='Agency Number'; row[1]='Agency Name'; row[2]='Posting'; row[3]='Item #';
+  prods.forEach((p,j)=>row[FIRST+j]=p.code);
+  // Row 5 — Date / Line Total / per-column sums
+  row=ensure(4); row[2]='Date'; row[3]='Line Total';
+  prods.forEach((p,j)=>{const L=col(FIRST+j);F(4,FIRST+j,`SUM(${L}${START}:${L}${lastDataRow})`);});
+  // Order rows
+  ORDERS.forEach((o,k)=>{
+    const sheetRow=START+k, idx=sheetRow-1, rw=ensure(idx);
+    rw[0]=o.agencyNum; rw[1]=o.agencyName;
+    rw[2]=o.ts?new Date(o.ts).toLocaleDateString('en-US'):o.date;
+    F(idx,3,`SUM(${col(FIRST)}${sheetRow}:${col(last)}${sheetRow})`);
+    prods.forEach((p,j)=>{
+      const q=o.items.filter(it=>it.code===p.code).reduce((s,it)=>s+(+it.qty||0),0);
+      if(q>0)rw[FIRST+j]=q;
+    });
+  });
+
+  const aoa=[];for(let i=0;i<lastDataRow;i++)aoa.push(R[i]||new Array(width).fill(null));
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  formulas.forEach(c=>{ws[XLSX.utils.encode_cell({r:c.r,c:c.c})]={t:'n',f:c.f};});
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:1}},{s:{r:1,c:0},e:{r:1,c:1}}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Grocery Rescue');
+  XLSX.writeFile(wb,'grocery-rescue-import-'+new Date().toISOString().slice(0,10)+'.xlsx');
 });
 $('pushSheets').addEventListener('click',async()=>{
   const url=STATE.settings.sheetUrl;
@@ -756,7 +794,7 @@ $('pushSheets').addEventListener('click',async()=>{
   const rows=ordersToRows();
   if(!rows.length){alert('No saved orders to send.');return;}
   try{
-    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({rows})});
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'orderRows',rows})});
     toast('Sent '+rows.length+' rows to Google Sheets ✓');
   }catch(err){alert('Could not reach Google Sheets: '+err.message);}
 });
@@ -857,8 +895,29 @@ $('fileAgcy').addEventListener('change',e=>{
   rd.readAsArrayBuffer(f);
 });
 
+// ---------- Cloud sync (Google Sheets via Apps Script) ----------
+function cloudLoadConfig(){
+  const url=STATE.settings.sheetUrl;if(!url)return;
+  const fn='__shfbCb';
+  window[fn]=data=>{
+    try{
+      if(data&&Array.isArray(data.items)&&data.items.length)STATE.products=data.items;
+      if(data&&Array.isArray(data.agencies)&&data.agencies.length)STATE.agencies=data.agencies;
+      saveConfig();applyHint();
+    }catch(e){}
+    delete window[fn];
+  };
+  const s=document.createElement('script');s.onerror=()=>{};
+  s.src=url+(url.indexOf('?')>-1?'&':'?')+'callback='+fn+'&_='+Date.now();
+  document.body.appendChild(s);
+}
+function cloudPost(payload){
+  const url=STATE.settings.sheetUrl;if(!url)return;
+  fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).catch(()=>{});
+}
+
 // ---------- Init ----------
-applySubtitle();applyHint();checkIntake();renderCart();
+applySubtitle();applyHint();checkIntake();renderCart();cloudLoadConfig();
 </script>
 </body>
 </html>
