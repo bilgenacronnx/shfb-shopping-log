@@ -29,9 +29,12 @@
   .brand .wm .n1{font-weight:800;font-size:16px}
   .brand .wm .n2{font-weight:600;font-size:10.5px;letter-spacing:2.2px;text-transform:uppercase;opacity:.92}
   .subbar{margin-top:11px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.16);display:inline-block;padding:4px 11px;border-radius:999px}
+  .langpick{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;font-size:18px}
   .gear{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.18);border:none;border-radius:10px;
     width:34px;height:34px;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .gear:active{transform:scale(.95)}
+  .langsel{height:42px;background:#fff;color:var(--ink);border:1.5px solid var(--green-line);border-radius:12px;font-size:15px;font-weight:700;padding:0 12px;cursor:pointer}
+  .langsel option{color:#000}
 
   .screens{flex:1 1 auto;overflow-y:auto;position:relative}
   .screen{display:none;padding:18px 18px 30px;animation:fade .25s ease}
@@ -209,76 +212,81 @@
   <div class="screens">
 
     <section class="screen active" id="s-intake">
-      <h2 class="title">Welcome — let's get started</h2>
-      <p class="lead">Enter your agency and your name to begin recording the food you're picking up today.</p>
-      <label>Agency number <span class="req">*</span></label>
-      <input type="text" id="agencyNum" inputmode="numeric" placeholder="e.g. 1042" autocomplete="off">
+      <h2 class="title" data-i18n="welcome_title">Welcome — let's get started</h2>
+      <p class="lead" data-i18n="welcome_lead">Enter your agency and your name to begin recording the food you're picking up today.</p>
+      <label><span data-i18n="agency_number">Agency number</span> <span class="req">*</span></label>
+      <input type="text" id="agencyNum" inputmode="numeric" placeholder="e.g. 1042" data-i18n-ph="ph_agency_num" autocomplete="off">
       <div class="hint" id="agencyHint"></div>
-      <label>Agency name <span class="req">*</span></label>
-      <input type="text" id="agencyName" placeholder="Auto-fills from your agency number">
-      <div class="filled-flag" id="agencyFlag">✓ Filled from agency profile</div>
+      <label><span data-i18n="agency_name">Agency name</span> <span class="req">*</span></label>
+      <input type="text" id="agencyName" placeholder="Auto-fills from your agency number" data-i18n-ph="ph_agency_name">
+      <div class="filled-flag" id="agencyFlag" data-i18n="agency_filled">✓ Filled from agency profile</div>
       <div class="row2">
-        <div><label>First name <span class="req">*</span></label><input type="text" id="firstName" placeholder="First" autocomplete="off"></div>
-        <div><label>Last name <span class="req">*</span></label><input type="text" id="lastName" placeholder="Last" autocomplete="off"></div>
+        <div><label><span data-i18n="first_name">First name</span> <span class="req">*</span></label><input type="text" id="firstName" placeholder="First" data-i18n-ph="ph_first" autocomplete="off"></div>
+        <div><label><span data-i18n="last_name">Last name</span> <span class="req">*</span></label><input type="text" id="lastName" placeholder="Last" data-i18n-ph="ph_last" autocomplete="off"></div>
       </div>
-      <label>Date <span class="req">*</span></label>
+      <label><span data-i18n="date">Date</span> <span class="req">*</span></label>
       <input type="date" id="visitDate">
-      <div class="stack" style="margin-top:22px"><button class="btn btn-primary" id="toScan" disabled>Start shopping →</button></div>
+      <div class="stack" style="margin-top:22px"><button class="btn btn-primary" id="toScan" data-i18n="start_shopping" disabled>Start shopping →</button></div>
+      <div class="langpick">🌐 <select class="langsel" id="langSel" title="Language / Idioma / 语言">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="zh">中文</option>
+      </select></div>
     </section>
 
     <section class="screen" id="s-scan">
-      <h2 class="title">Scan a shelf tag</h2>
-      <p class="lead">Point your camera at the QR code on the product's shelf tag.</p>
+      <h2 class="title" data-i18n="scan_title">Scan a shelf tag</h2>
+      <p class="lead" data-i18n="scan_lead">Point your camera at the QR code on the product's shelf tag.</p>
       <div id="qrReader" style="width:100%;border-radius:18px;overflow:hidden;display:none;margin-bottom:8px"></div>
       <div class="scanner" id="scanPlaceholder"><div class="reticle"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div><div class="scanline"></div></div>
       <div class="scan-cap" id="scanStatus">Tap “Start camera” to scan a QR code.</div>
-      <div class="stack"><button class="btn btn-primary" id="startCam">📷 Start camera</button><button class="btn btn-ghost" id="stopCam" style="display:none">Stop camera</button></div>
-      <div class="demo-note" style="margin-top:12px">No camera? Tap a shelf tag below to enter an item manually.</div>
+      <div class="stack"><button class="btn btn-primary" id="startCam" data-i18n="start_camera">📷 Start camera</button><button class="btn btn-ghost" id="stopCam" data-i18n="stop_camera" style="display:none">Stop camera</button></div>
+      <div class="demo-note" style="margin-top:12px" data-i18n="scan_demo">No camera? Tap a shelf tag below to enter an item manually.</div>
       <div class="tag-grid" id="tagGrid"></div>
-      <div class="stack" style="margin-top:14px"><button class="btn btn-ghost" id="toCartFromScan">Review cart (<span id="scanCount">0</span>)</button></div>
+      <div class="stack" style="margin-top:14px"><button class="btn btn-ghost" id="toCartFromScan"><span data-i18n="review_cart">Review cart</span> (<span id="scanCount">0</span>)</button></div>
     </section>
 
     <section class="screen" id="s-item">
-      <button class="backlink" id="itemBack">‹ Back to scanning</button>
+      <button class="backlink" id="itemBack" data-i18n="back_scanning">‹ Back to scanning</button>
       <div class="item-hero"><div class="emo" id="itemEmo">🍊</div><div class="nm" id="itemName">Oranges</div><div id="itemChip"></div></div>
       <div class="limit-banner" id="limitBanner" style="display:none"></div>
       <div class="entry-help" id="entryHelp"></div>
       <div class="qty-wrap"><input type="number" id="qtyInput" inputmode="decimal" min="0" step="1" value=""><span class="qty-unit" id="qtyUnit">lbs</span></div>
       <div class="stepper"><button id="qMinus">–</button><button id="qPlus">+</button></div>
       <div class="warn" id="qtyWarn"></div>
-      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="addItem">Add to cart</button><button class="btn btn-ghost" id="cancelItem">Cancel</button></div>
+      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="addItem" data-i18n="add_to_cart">Add to cart</button><button class="btn btn-ghost" id="cancelItem" data-i18n="cancel">Cancel</button></div>
     </section>
 
     <section class="screen" id="s-cart">
-      <button class="backlink" id="cartBack">‹ Add more items</button>
-      <h2 class="title">Your shopping log</h2>
+      <button class="backlink" id="cartBack" data-i18n="back_add_more">‹ Add more items</button>
+      <h2 class="title" data-i18n="cart_title">Your shopping log</h2>
       <p class="lead" id="cartLead"></p>
       <div id="cartList"></div>
-      <div class="stack" style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="addMore">+ Scan another item</button><button class="btn btn-primary" id="toSign" disabled>Review &amp; sign →</button></div>
+      <div class="stack" style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="addMore" data-i18n="scan_another">+ Scan another item</button><button class="btn btn-primary" id="toSign" data-i18n="review_sign" disabled>Review &amp; sign →</button></div>
     </section>
 
     <section class="screen" id="s-sign">
-      <button class="backlink" id="signBack">‹ Back to cart</button>
-      <h2 class="title">Confirm &amp; sign</h2>
-      <p class="lead">Review the details below, then sign to submit your pickup.</p>
+      <button class="backlink" id="signBack" data-i18n="back_cart">‹ Back to cart</button>
+      <h2 class="title" data-i18n="sign_title">Confirm &amp; sign</h2>
+      <p class="lead" data-i18n="sign_lead">Review the details below, then sign to submit your pickup.</p>
       <div class="summary-card" id="signSummary"></div>
-      <label>Signature <span class="req">*</span></label>
+      <label><span data-i18n="signature">Signature</span> <span class="req">*</span></label>
       <canvas class="sig-pad" id="sigPad"></canvas>
-      <div class="sig-row"><span class="lbl">Sign with your finger or mouse</span><button class="sig-clear" id="sigClear">Clear</button></div>
-      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="submitBtn" disabled>Submit pickup</button></div>
+      <div class="sig-row"><span class="lbl" data-i18n="sign_hint">Sign with your finger or mouse</span><button class="sig-clear" id="sigClear" data-i18n="clear">Clear</button></div>
+      <div class="stack" style="margin-top:18px"><button class="btn btn-primary" id="submitBtn" data-i18n="submit_pickup" disabled>Submit pickup</button></div>
     </section>
 
     <section class="screen" id="s-done">
       <div class="done">
         <div class="check"><svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4a8a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h2>Pickup submitted!</h2>
-        <p class="ord">Confirmation <b id="ordNum">#SH-000000</b></p>
+        <h2 data-i18n="done_title">Pickup submitted!</h2>
+        <p class="ord"><span data-i18n="confirmation">Confirmation</span> <b id="ordNum">#SH-000000</b></p>
         <div class="email-pill" id="emailPill"></div>
         <div class="summary-card" id="doneSummary" style="text-align:left"></div>
         <div class="stack">
-          <button class="btn btn-ghost btn-sm" id="previewEmail">✉ Preview confirmation email</button>
-          <button class="btn btn-orange btn-sm" id="printInv">🖨 Print invoice</button>
-          <button class="btn btn-primary" id="newSession" style="margin-top:6px">Start a new pickup</button>
+          <button class="btn btn-ghost btn-sm" id="previewEmail" data-i18n="preview_email">✉ Preview confirmation email</button>
+          <button class="btn btn-orange btn-sm" id="printInv" data-i18n="print_invoice">🖨 Print invoice</button>
+          <button class="btn btn-primary" id="newSession" data-i18n="new_pickup" style="margin-top:6px">Start a new pickup</button>
         </div>
       </div>
     </section>
@@ -304,7 +312,7 @@
         <button data-tab="settings">Settings</button>
       </div>
       <div class="tabpane on" id="tab-products">
-        <p class="mini">Each item's <b>code</b> is what the shelf-tag QR encodes. Limit qty is the default max per pickup (leave 0 for no limit).</p>
+        <p class="mini"><b>Main items</b> — every agency can pick these. The <b>code</b> is what the shelf-tag QR encodes; limit qty is the default max per pickup (0 = no limit).</p>
         <div style="display:flex;gap:8px;margin-bottom:10px">
           <button class="btn btn-ghost btn-sm" id="tplProd">⬇ Excel template</button>
           <button class="btn btn-ghost btn-sm" id="impProd">⬆ Import Excel</button>
@@ -312,7 +320,17 @@
         <input type="file" id="fileProd" accept=".xlsx,.xls,.csv" style="display:none">
         <div id="prodList"></div>
         <button class="btn btn-ghost btn-sm" id="addProd">+ Add item</button>
-        <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveProd">Save items</button></div>
+        <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveProd">Save main items</button></div>
+        <hr style="border:none;border-top:1px solid var(--green-line);margin:18px 0">
+        <p class="mini"><b>Hub items</b> — only agencies with “Can pick Hub items” turned on will see these.</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn btn-ghost btn-sm" id="tplHub">⬇ Excel template</button>
+          <button class="btn btn-ghost btn-sm" id="impHub">⬆ Import Excel</button>
+        </div>
+        <input type="file" id="fileHub" accept=".xlsx,.xls,.csv" style="display:none">
+        <div id="hubList"></div>
+        <button class="btn btn-ghost btn-sm" id="addHub">+ Add hub item</button>
+        <div class="stack" style="margin-top:12px"><button class="btn btn-primary" id="saveHub">Save hub items</button></div>
       </div>
       <div class="tabpane" id="tab-agencies">
         <p class="mini">Agency profiles. Use <b>Per-item limits</b> to override the default limit for a specific agency.</p>
@@ -370,24 +388,44 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 // ---------- Persistent config ----------
-const LS_KEY='shfb_config_v1';
+const LS_KEY='shfb_config_v2';
 const DEFAULTS={
   products:[
-    {code:'PRD-001',name:'Oranges',emo:'🍊',unit:'lbs',limit:30},
-    {code:'PRD-002',name:'Potatoes',emo:'🥔',unit:'lbs',limit:25},
-    {code:'PRD-003',name:'Apples',emo:'🍎',unit:'lbs',limit:30},
-    {code:'PRD-004',name:'Carrots',emo:'🥕',unit:'lbs',limit:20},
-    {code:'PRD-005',name:'Bananas',emo:'🍌',unit:'lbs',limit:25},
-    {code:'PRD-006',name:'Eggs',emo:'🥚',unit:'case',limit:2},
-    {code:'PRD-007',name:'Milk',emo:'🥛',unit:'case',limit:3},
-    {code:'PRD-008',name:'Bread',emo:'🍞',unit:'case',limit:4}
+    {code:'80559',name:'Assorted - Food Frozen',emo:'🧊',unit:'lbs',limit:12},
+    {code:'80579',name:'Food Refrigerated',emo:'❄️',unit:'lbs',limit:15},
+    {code:'86406',name:'Meat Assorted',emo:'🥩',unit:'lbs',limit:13},
+    {code:'86445',name:'Non Food - Assorted',emo:'🧴',unit:'lbs',limit:4},
+    {code:'86442',name:'Dairy / Eggs',emo:'🥚',unit:'lbs',limit:0},
+    {code:'86407',name:'Produce Fresh',emo:'🥬',unit:'lbs',limit:0},
+    {code:'80558',name:'Food Dry',emo:'🥫',unit:'lbs',limit:0},
+    {code:'86441',name:'Beverage',emo:'🧃',unit:'lbs',limit:0},
+    {code:'88043',name:'Pet Food',emo:'🐾',unit:'lbs',limit:0},
+    {code:'85299',name:'Assorted Bread / Bakery',emo:'🥐',unit:'case',limit:0},
+    {code:'85299',name:'Bread / Bakery',emo:'🍞',unit:'lbs',limit:0},
+    {code:'84510',name:'Bananas',emo:'🍌',unit:'lbs',limit:0}
+  ],
+  hubProducts:[
+    {code:'83422',name:'Honeydew',emo:'🍈',unit:'lbs',limit:0},
+    {code:'82570',name:'Broccoli',emo:'🥦',unit:'lbs',limit:0},
+    {code:'81127',name:'Zucchini',emo:'🥒',unit:'lbs',limit:0},
+    {code:'83315',name:'Potato',emo:'🥔',unit:'lbs',limit:0},
+    {code:'83204',name:'Cauliflower',emo:'🥬',unit:'lbs',limit:0},
+    {code:'83537',name:'Orange',emo:'🍊',unit:'lbs',limit:0},
+    {code:'83313',name:'Sweet Potato',emo:'🍠',unit:'lbs',limit:0},
+    {code:'83074',name:'Squash Butternut',emo:'🎃',unit:'lbs',limit:0},
+    {code:'85614',name:'Carrot',emo:'🥕',unit:'lbs',limit:0},
+    {code:'83563',name:'Squash Grey',emo:'🎃',unit:'lbs',limit:0},
+    {code:'82677',name:'Korean Melon',emo:'🍈',unit:'lbs',limit:0},
+    {code:'83574',name:'Tomatillo',emo:'🫑',unit:'lbs',limit:0},
+    {code:'83325',name:'Onion',emo:'🧅',unit:'lbs',limit:0},
+    {code:'84011',name:'Stonefruit',emo:'🍑',unit:'lbs',limit:0}
   ],
   agencies:[
-    {number:'1042',name:'Sacred Heart Community Service',email:'pantry@sacredheartcs.org',limits:{}},
-    {number:'2087',name:'West Valley Community Services',email:'food@wvcs.org',limits:{}},
-    {number:'3155',name:'Loaves & Fishes Family Kitchen',email:'intake@loavesfishes.org',limits:{'PRD-006':1}},
-    {number:'4023',name:"Martha's Kitchen",email:'orders@marthas-kitchen.org',limits:{}},
-    {number:'5120',name:"St. Joseph's Family Center",email:'pantry@sjfc.org',limits:{}}
+    {number:'1042',name:'Sacred Heart Community Service',email:'pantry@sacredheartcs.org',hub:true,limits:{}},
+    {number:'2087',name:'West Valley Community Services',email:'food@wvcs.org',hub:false,limits:{}},
+    {number:'3155',name:'Loaves & Fishes Family Kitchen',email:'intake@loavesfishes.org',hub:true,limits:{}},
+    {number:'4023',name:"Martha's Kitchen",email:'orders@marthas-kitchen.org',hub:false,limits:{}},
+    {number:'5120',name:"St. Joseph's Family Center",email:'pantry@sjfc.org',hub:false,limits:{}}
   ],
   settings:{orgEmail:'warehouse@shfb.org',subtitle:'Partner Agency Shopping Log',pin:'1234',sheetUrl:''}
 };
@@ -396,6 +434,8 @@ function loadConfig(){
   try{const raw=localStorage.getItem(LS_KEY); STATE=raw?JSON.parse(raw):structuredClone(DEFAULTS);}
   catch(e){STATE=structuredClone(DEFAULTS);}
   if(STATE.settings.sheetUrl===undefined)STATE.settings.sheetUrl='';
+  if(!Array.isArray(STATE.hubProducts))STATE.hubProducts=structuredClone(DEFAULTS.hubProducts);
+  STATE.agencies.forEach(a=>{if(a.hub===undefined)a.hub=false;if(!a.limits)a.limits={};});
 }
 function saveConfig(){try{localStorage.setItem(LS_KEY,JSON.stringify(STATE));}catch(e){}}
 loadConfig();
@@ -410,8 +450,14 @@ loadOrders();
 const $=id=>document.getElementById(id);
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelector('.screens').scrollTop=0;}
 function unitLabel(u){return u==='case'?'case(s)':'lbs';}
-function productByCode(c){return STATE.products.find(p=>p.code===c);}
+function allItems(){return STATE.products.concat(STATE.hubProducts||[]);}
+function productByCode(c){return allItems().find(p=>p.code===c);}
 function agencyByNumber(n){return STATE.agencies.find(a=>a.number===String(n).trim());}
+function shoppingItems(agencyNum){
+  const a=agencyByNumber(agencyNum);
+  return STATE.products.concat((a&&a.hub)?(STATE.hubProducts||[]):[]);
+}
+function isHubCode(c){return (STATE.hubProducts||[]).some(p=>p.code===c);}
 function effectiveLimit(agencyNum,code){
   const a=agencyByNumber(agencyNum);
   if(a&&a.limits&&a.limits[code]>0)return a.limits[code];
@@ -419,11 +465,146 @@ function effectiveLimit(agencyNum,code){
 }
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500);}
 
+// ---------- Internationalization (i18n) ----------
+const I18N={
+  en:{
+    subtitle:"Partner Agency Shopping Log",
+    welcome_title:"Welcome — let's get started",
+    welcome_lead:"Enter your agency and your name to begin recording the food you're picking up today.",
+    agency_number:"Agency number",agency_name:"Agency name",first_name:"First name",last_name:"Last name",date:"Date",
+    agency_filled:"✓ Filled from agency profile",agency_hint:"Demo numbers that auto-fill: ",start_shopping:"Start shopping →",
+    ph_agency_num:"e.g. 1042",ph_agency_name:"Auto-fills from your agency number",ph_first:"First",ph_last:"Last",
+    scan_title:"Scan a shelf tag",scan_lead:"Point your camera at the QR code on the product's shelf tag.",
+    scan_start_hint:"Tap “Start camera” to scan a QR code.",scan_aim:"Point the camera at a shelf-tag QR code…",
+    start_camera:"📷 Start camera",stop_camera:"Stop camera",
+    scan_demo:"No camera? Tap a shelf tag below to enter an item manually.",review_cart:"Review cart",
+    cam_fail:"Could not start the camera. Use the tags below instead.",cam_no_lib:"Camera not available — use the tags below.",
+    scan_unrecognized:"Unrecognized code: ",scan_hub_denied:"That is a Hub item — your agency is not enabled for Hub items.",
+    by_pound:"By the pound",by_case:"By the case",picked_pound:"Picked by the pound",picked_case:"Picked by the case",
+    back_scanning:"‹ Back to scanning",entry_help_lbs:"Weigh the item on the scale, then enter the total pounds.",
+    entry_help_case:"Count the cases you are taking and enter the number.",limit_for_agency:"Limit for your agency: {lim} {unit}",
+    add_to_cart:"Add to cart",cancel:"Cancel",warn_qty_zero:"Please enter a quantity greater than 0.",
+    over_limit:"That brings your {name} to {combined} {unit}, over the {lim} {unit} limit. Please reduce the amount.",
+    back_add_more:"‹ Add more items",cart_title:"Your shopping log",
+    cart_lead_full:"Review what you've picked up. Tap an item to edit, or Remove to delete.",
+    cart_lead_empty:"Your log is empty — scan a shelf tag to add items.",empty_cart:"No items yet. Scan a shelf tag to begin.",
+    scan_another:"+ Scan another item",review_sign:"Review & sign →",remove:"Remove",
+    back_cart:"‹ Back to cart",sign_title:"Confirm & sign",sign_lead:"Review the details below, then sign to submit your pickup.",
+    signature:"Signature",sign_hint:"Sign with your finger or mouse",clear:"Clear",submit_pickup:"Submit pickup",
+    done_title:"Pickup submitted!",confirmation:"Confirmation",preview_email:"✉ Preview confirmation email",
+    print_invoice:"🖨 Print invoice",new_pickup:"Start a new pickup",emailed_to:"Confirmation emailed to",and:"and",
+    lbl_agency:"Agency",lbl_picked_by:"Picked up by",lbl_date:"Date",lbl_items:"Items"
+  },
+  es:{
+    subtitle:"Registro de Compras para Agencias Asociadas",
+    welcome_title:"Bienvenido — comencemos",
+    welcome_lead:"Ingrese su agencia y su nombre para comenzar a registrar los alimentos que recoge hoy.",
+    agency_number:"Número de agencia",agency_name:"Nombre de la agencia",first_name:"Nombre",last_name:"Apellido",date:"Fecha",
+    agency_filled:"✓ Completado desde el perfil de la agencia",agency_hint:"Números de demostración que se completan solos: ",start_shopping:"Comenzar →",
+    ph_agency_num:"ej. 1042",ph_agency_name:"Se completa con su número de agencia",ph_first:"Nombre",ph_last:"Apellido",
+    scan_title:"Escanee una etiqueta",scan_lead:"Apunte la cámara al código QR de la etiqueta del producto.",
+    scan_start_hint:"Toque “Iniciar cámara” para escanear un código QR.",scan_aim:"Apunte la cámara al código QR de la etiqueta…",
+    start_camera:"📷 Iniciar cámara",stop_camera:"Detener cámara",
+    scan_demo:"¿Sin cámara? Toque una etiqueta abajo para ingresar un artículo manualmente.",review_cart:"Revisar carrito",
+    cam_fail:"No se pudo iniciar la cámara. Use las etiquetas de abajo.",cam_no_lib:"Cámara no disponible — use las etiquetas de abajo.",
+    scan_unrecognized:"Código no reconocido: ",scan_hub_denied:"Este es un artículo Hub — su agencia no está habilitada para artículos Hub.",
+    by_pound:"Por libra",by_case:"Por caja",picked_pound:"Se recoge por libra",picked_case:"Se recoge por caja",
+    back_scanning:"‹ Volver a escanear",entry_help_lbs:"Pese el artículo en la balanza y luego ingrese el total de libras.",
+    entry_help_case:"Cuente las cajas que llevará e ingrese el número.",limit_for_agency:"Límite para su agencia: {lim} {unit}",
+    add_to_cart:"Agregar al carrito",cancel:"Cancelar",warn_qty_zero:"Ingrese una cantidad mayor que 0.",
+    over_limit:"Esto eleva su {name} a {combined} {unit}, superando el límite de {lim} {unit}. Reduzca la cantidad.",
+    back_add_more:"‹ Agregar más artículos",cart_title:"Su registro de compras",
+    cart_lead_full:"Revise lo que ha recogido. Toque un artículo para editar o Quitar para eliminar.",
+    cart_lead_empty:"Su registro está vacío — escanee una etiqueta para agregar artículos.",empty_cart:"Aún no hay artículos. Escanee una etiqueta para comenzar.",
+    scan_another:"+ Escanear otro artículo",review_sign:"Revisar y firmar →",remove:"Quitar",
+    back_cart:"‹ Volver al carrito",sign_title:"Confirmar y firmar",sign_lead:"Revise los detalles a continuación y firme para enviar su recogida.",
+    signature:"Firma",sign_hint:"Firme con el dedo o el ratón",clear:"Borrar",submit_pickup:"Enviar recogida",
+    done_title:"¡Recogida enviada!",confirmation:"Confirmación",preview_email:"✉ Vista previa del correo de confirmación",
+    print_invoice:"🖨 Imprimir factura",new_pickup:"Iniciar una nueva recogida",emailed_to:"Confirmación enviada por correo a",and:"y",
+    lbl_agency:"Agencia",lbl_picked_by:"Recogido por",lbl_date:"Fecha",lbl_items:"Artículos"
+  },
+  zh:{
+    subtitle:"合作机构领取记录",
+    welcome_title:"欢迎 — 让我们开始",
+    welcome_lead:"请输入您的机构和姓名，开始记录您今天领取的食品。",
+    agency_number:"机构编号",agency_name:"机构名称",first_name:"名字",last_name:"姓氏",date:"日期",
+    agency_filled:"✓ 已根据机构资料填写",agency_hint:"可自动填写的演示编号：",start_shopping:"开始领取 →",
+    ph_agency_num:"例如 1042",ph_agency_name:"根据机构编号自动填写",ph_first:"名字",ph_last:"姓氏",
+    scan_title:"扫描货架标签",scan_lead:"请将相机对准产品货架标签上的二维码。",
+    scan_start_hint:"点击“启动相机”扫描二维码。",scan_aim:"将相机对准货架标签上的二维码…",
+    start_camera:"📷 启动相机",stop_camera:"停止相机",
+    scan_demo:"没有相机？点击下方的货架标签手动输入物品。",review_cart:"查看购物车",
+    cam_fail:"无法启动相机。请改用下方的标签。",cam_no_lib:"相机不可用 — 请使用下方的标签。",
+    scan_unrecognized:"无法识别的编号：",scan_hub_denied:"这是 Hub 物品 — 您的机构未启用 Hub 物品。",
+    by_pound:"按磅",by_case:"按箱",picked_pound:"按磅领取",picked_case:"按箱领取",
+    back_scanning:"‹ 返回扫描",entry_help_lbs:"请在秤上称量物品，然后输入总磅数。",
+    entry_help_case:"请数一数您要拿的箱数并输入数量。",limit_for_agency:"您机构的限额：{lim} {unit}",
+    add_to_cart:"加入购物车",cancel:"取消",warn_qty_zero:"请输入大于 0 的数量。",
+    over_limit:"这会使您的 {name} 达到 {combined} {unit}，超过 {lim} {unit} 的限额。请减少数量。",
+    back_add_more:"‹ 添加更多物品",cart_title:"您的领取清单",
+    cart_lead_full:"查看您已领取的物品。点击物品可编辑，或点击“删除”移除。",
+    cart_lead_empty:"您的清单为空 — 扫描货架标签以添加物品。",empty_cart:"暂无物品。扫描货架标签即可开始。",
+    scan_another:"+ 扫描另一件物品",review_sign:"查看并签名 →",remove:"删除",
+    back_cart:"‹ 返回购物车",sign_title:"确认并签名",sign_lead:"请查看以下详细信息，然后签名提交您的领取。",
+    signature:"签名",sign_hint:"用手指或鼠标签名",clear:"清除",submit_pickup:"提交领取",
+    done_title:"领取已提交！",confirmation:"确认编号",preview_email:"✉ 预览确认电子邮件",
+    print_invoice:"🖨 打印单据",new_pickup:"开始新的领取",emailed_to:"确认邮件已发送至",and:"和",
+    lbl_agency:"机构",lbl_picked_by:"领取人",lbl_date:"日期",lbl_items:"物品数量"
+  }
+};
+const LANG_KEY='shfb_lang';
+let LANG=(function(){try{const s=localStorage.getItem(LANG_KEY);if(s)return s;const n=(navigator.language||'').slice(0,2).toLowerCase();return n==='es'?'es':n==='zh'?'zh':'en';}catch(e){return 'en';}})();
+function t(k,params){let s=(I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;if(params)Object.keys(params).forEach(p=>{s=s.split('{'+p+'}').join(params[p]);});return s;}
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.getAttribute('data-i18n'));});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.getAttribute('data-i18n-ph'));});
+  const ls=$('langSel');if(ls)ls.value=LANG;
+  applySubtitle();applyHint();renderCart();
+  const ss=$('scanStatus');if(ss&&!qrScanner)ss.textContent=t('scan_start_hint');
+}
+
+// ---------- Item-name translations (built-in for default items; admin can override per item) ----------
+const ITEM_I18N={
+  "Assorted - Food Frozen":{es:"Surtido - Comida Congelada",zh:"杂项 - 冷冻食品"},
+  "Food Refrigerated":{es:"Comida Refrigerada",zh:"冷藏食品"},
+  "Meat Assorted":{es:"Carne Surtida",zh:"杂项肉类"},
+  "Non Food - Assorted":{es:"No Alimentos - Surtido",zh:"非食品 - 杂项"},
+  "Dairy / Eggs":{es:"Lácteos / Huevos",zh:"乳制品 / 鸡蛋"},
+  "Produce Fresh":{es:"Productos Frescos",zh:"新鲜农产品"},
+  "Food Dry":{es:"Comida Seca",zh:"干货食品"},
+  "Beverage":{es:"Bebidas",zh:"饮料"},
+  "Pet Food":{es:"Comida para Mascotas",zh:"宠物食品"},
+  "Assorted Bread / Bakery":{es:"Pan / Panadería Surtido",zh:"杂项面包 / 烘焙"},
+  "Bread / Bakery":{es:"Pan / Panadería",zh:"面包 / 烘焙"},
+  "Bananas":{es:"Plátanos",zh:"香蕉"},
+  "Honeydew":{es:"Melón Verde",zh:"哈密瓜"},
+  "Broccoli":{es:"Brócoli",zh:"西兰花"},
+  "Zucchini":{es:"Calabacín",zh:"西葫芦"},
+  "Potato":{es:"Papa",zh:"土豆"},
+  "Cauliflower":{es:"Coliflor",zh:"花椰菜"},
+  "Orange":{es:"Naranja",zh:"橙子"},
+  "Sweet Potato":{es:"Camote",zh:"红薯"},
+  "Squash Butternut":{es:"Calabaza Butternut",zh:"胡桃南瓜"},
+  "Carrot":{es:"Zanahoria",zh:"胡萝卜"},
+  "Squash Grey":{es:"Calabaza Gris",zh:"灰南瓜"},
+  "Korean Melon":{es:"Melón Coreano",zh:"韩国甜瓜"},
+  "Tomatillo":{es:"Tomatillo",zh:"墨西哥酸浆"},
+  "Onion":{es:"Cebolla",zh:"洋葱"},
+  "Stonefruit":{es:"Fruta de Hueso",zh:"核果"}
+};
+function dispName(o){
+  if(!o)return '';
+  if(LANG==='es')return o.name_es||(ITEM_I18N[o.name]&&ITEM_I18N[o.name].es)||o.name;
+  if(LANG==='zh')return o.name_zh||(ITEM_I18N[o.name]&&ITEM_I18N[o.name].zh)||o.name;
+  return o.name;
+}
+
 const cart=[]; let currentCode=null, editIndex=null, sigDataUrl=null, lastOrder=null;
 
 const visitDate=$('visitDate'); visitDate.valueAsDate=new Date();
-function applySubtitle(){$('subbar').textContent=STATE.settings.subtitle;}
-function applyHint(){$('agencyHint').innerHTML='Demo numbers that auto-fill: <b>'+STATE.agencies.map(a=>a.number).join(', ')+'</b>';}
+function applySubtitle(){const s=STATE.settings.subtitle;$('subbar').textContent=(s&&s!=='Partner Agency Shopping Log')?s:t('subtitle');}
+function applyHint(){$('agencyHint').innerHTML=t('agency_hint')+'<b>'+STATE.agencies.map(a=>a.number).join(', ')+'</b>';}
 function checkIntake(){
   const ok=$('agencyNum').value.trim()&&$('agencyName').value.trim()&&$('firstName').value.trim()&&$('lastName').value.trim()&&visitDate.value;
   $('toScan').disabled=!ok;
@@ -441,10 +622,11 @@ $('toScan').addEventListener('click',()=>{buildTags();show('s-scan');});
 
 function buildTags(){
   const grid=$('tagGrid');grid.innerHTML='';
-  STATE.products.forEach(p=>{
+  shoppingItems($('agencyNum').value).forEach(p=>{
+    const hub=isHubCode(p.code);
     const d=document.createElement('div');d.className='tag';
-    d.innerHTML=`<span class="emo">${p.emo||'📦'}</span><div class="nm">${p.name}</div><div class="cd">${p.code}</div>
-      <span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?'By the case':'By the pound'}</span>`;
+    d.innerHTML=`<span class="emo">${p.emo||'📦'}</span><div class="nm">${dispName(p)}</div><div class="cd">${p.code}${hub?' · HUB':''}</div>
+      <span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?t('by_case'):t('by_pound')}</span>`;
     d.addEventListener('click',()=>openItem(p.code));
     grid.appendChild(d);
   });
@@ -456,13 +638,13 @@ $('toCartFromScan').addEventListener('click',()=>{stopScanner();renderCart();sho
 // ---------- Camera QR scanning ----------
 let qrScanner=null;
 function startScanner(){
-  if(typeof Html5Qrcode==='undefined'){$('scanStatus').textContent='Camera library not loaded — use the tags below.';return;}
+  if(typeof Html5Qrcode==='undefined'){$('scanStatus').textContent=t('cam_no_lib');return;}
   $('qrReader').style.display='block';$('scanPlaceholder').style.display='none';
   $('startCam').style.display='none';$('stopCam').style.display='block';
-  $('scanStatus').textContent='Point the camera at a shelf-tag QR code…';
+  $('scanStatus').textContent=t('scan_aim');
   qrScanner=new Html5Qrcode('qrReader');
   qrScanner.start({facingMode:'environment'},{fps:10,qrbox:200},onScan,()=>{}).catch(err=>{
-    $('scanStatus').textContent='Could not start camera ('+err+'). Use the tags below instead.';
+    $('scanStatus').textContent=t('cam_fail');
     $('qrReader').style.display='none';$('scanPlaceholder').style.display='flex';
     $('startCam').style.display='block';$('stopCam').style.display='none';qrScanner=null;
   });
@@ -471,14 +653,16 @@ function stopScanner(){
   if(qrScanner){const s=qrScanner;qrScanner=null;s.stop().then(()=>s.clear()).catch(()=>{});}
   $('qrReader').style.display='none';$('scanPlaceholder').style.display='flex';
   $('startCam').style.display='block';$('stopCam').style.display='none';
-  $('scanStatus').textContent='Tap “Start camera” to scan a QR code.';
+  $('scanStatus').textContent=t('scan_start_hint');
 }
 function onScan(text){
   let code=String(text).trim();
   const m=code.match(/[?&]code=([^&]+)/);if(m)code=decodeURIComponent(m[1]);
-  const p=productByCode(code)||STATE.products.find(x=>x.code.toLowerCase()===code.toLowerCase());
+  const allowed=shoppingItems($('agencyNum').value);
+  const p=allowed.find(x=>x.code===code)||allowed.find(x=>x.code.toLowerCase()===code.toLowerCase());
   if(p){stopScanner();openItem(p.code);}
-  else{$('scanStatus').textContent='Unrecognized code: '+code;}
+  else if(isHubCode(code)){$('scanStatus').textContent=t('scan_hub_denied');}
+  else{$('scanStatus').textContent=t('scan_unrecognized')+code;}
 }
 $('startCam').addEventListener('click',startScanner);
 $('stopCam').addEventListener('click',stopScanner);
@@ -486,13 +670,13 @@ $('stopCam').addEventListener('click',stopScanner);
 function cartQtyForCode(code,exclude){return cart.reduce((s,it,i)=>(it.code===code&&i!==exclude?s+it.qty:s),0);}
 function openItem(code,idx=null){
   currentCode=code;editIndex=idx;const p=productByCode(code);
-  $('itemEmo').textContent=p.emo||'📦';$('itemName').textContent=p.name;
+  $('itemEmo').textContent=p.emo||'📦';$('itemName').textContent=dispName(p);
   $('qtyUnit').textContent=unitLabel(p.unit);
-  $('itemChip').innerHTML=`<span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?'Picked by the case':'Picked by the pound'}</span>`;
-  $('entryHelp').textContent=p.unit==='case'?'Count the cases you are taking and enter the number.':'Weigh the item on the scale, then enter the total pounds.';
+  $('itemChip').innerHTML=`<span class="unit-chip ${p.unit==='case'?'chip-cs':'chip-lb'}">${p.unit==='case'?t('picked_case'):t('picked_pound')}</span>`;
+  $('entryHelp').textContent=p.unit==='case'?t('entry_help_case'):t('entry_help_lbs');
   const lim=effectiveLimit($('agencyNum').value,code);
   const lb=$('limitBanner');
-  if(lim>0){lb.style.display='block';lb.textContent=`Limit for your agency: ${lim} ${unitLabel(p.unit)}`;}
+  if(lim>0){lb.style.display='block';lb.textContent=t('limit_for_agency',{lim:lim,unit:unitLabel(p.unit)});}
   else{lb.style.display='none';}
   $('qtyInput').value=idx!==null?cart[idx].qty:'';
   $('qtyWarn').classList.remove('show');$('qtyInput').style.borderColor='';
@@ -505,31 +689,31 @@ $('cancelItem').addEventListener('click',()=>show('s-scan'));
 $('addItem').addEventListener('click',()=>{
   const qty=parseFloat($('qtyInput').value);const p=productByCode(currentCode);
   const warn=$('qtyWarn');
-  if(!(qty>0)){$('qtyInput').focus();$('qtyInput').style.borderColor='var(--orange)';warn.textContent='Please enter a quantity greater than 0.';warn.classList.add('show');return;}
+  if(!(qty>0)){$('qtyInput').focus();$('qtyInput').style.borderColor='var(--orange)';warn.textContent=t('warn_qty_zero');warn.classList.add('show');return;}
   const lim=effectiveLimit($('agencyNum').value,currentCode);
   const combined=cartQtyForCode(currentCode,editIndex)+qty;
   if(lim>0&&combined>lim){
-    warn.textContent=`That brings your ${p.name} to ${combined} ${unitLabel(p.unit)}, over the ${lim} ${unitLabel(p.unit)} limit. Please reduce the amount.`;
+    warn.textContent=t('over_limit',{name:p.name,combined:combined,lim:lim,unit:unitLabel(p.unit)});
     warn.classList.add('show');$('qtyInput').style.borderColor='var(--orange)';return;
   }
   warn.classList.remove('show');
   if(editIndex!==null)cart[editIndex].qty=qty;
-  else cart.push({code:currentCode,name:p.name,emo:p.emo||'📦',unit:p.unit,qty});
+  else cart.push({code:currentCode,name:p.name,name_es:p.name_es,name_zh:p.name_zh,emo:p.emo||'📦',unit:p.unit,qty});
   updateScanCount();renderCart();show('s-cart');
 });
 
 function renderCart(){
   const list=$('cartList');list.innerHTML='';
-  if(cart.length===0)list.innerHTML='<div class="empty">No items yet.<br>Scan a shelf tag to begin.</div>';
+  if(cart.length===0)list.innerHTML='<div class="empty">'+t('empty_cart')+'</div>';
   cart.forEach((it,idx)=>{
     const d=document.createElement('div');d.className='cart-item';
-    d.innerHTML=`<span class="emo">${it.emo}</span><div class="info"><div class="nm">${it.name}</div><div class="q">${it.qty} ${unitLabel(it.unit)} · ${it.code}</div></div><button class="rm">Remove</button>`;
+    d.innerHTML=`<span class="emo">${it.emo}</span><div class="info"><div class="nm">${dispName(it)}</div><div class="q">${it.qty} ${unitLabel(it.unit)} · ${it.code}</div></div><button class="rm">${t('remove')}</button>`;
     d.querySelector('.info').addEventListener('click',()=>openItem(it.code,idx));
     d.querySelector('.rm').addEventListener('click',e=>{e.stopPropagation();cart.splice(idx,1);updateScanCount();renderCart();});
     list.appendChild(d);
   });
   $('toSign').disabled=cart.length===0;
-  $('cartLead').textContent=cart.length?"Review what you've picked up. Tap an item to edit, or Remove to delete.":"Your log is empty — scan a shelf tag to add items.";
+  $('cartLead').textContent=cart.length?t('cart_lead_full'):t('cart_lead_empty');
 }
 $('cartBack').addEventListener('click',()=>show('s-scan'));
 $('addMore').addEventListener('click',()=>show('s-scan'));
@@ -537,11 +721,11 @@ $('toSign').addEventListener('click',()=>{buildSummary('signSummary');show('s-si
 
 function fmtDate(){return new Date(visitDate.value+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function buildSummary(targetId){
-  let r=`<div class="r"><span class="k">Agency</span><span class="v">${$('agencyName').value} (#${$('agencyNum').value})</span></div>
-    <div class="r"><span class="k">Picked up by</span><span class="v">${$('firstName').value} ${$('lastName').value}</span></div>
-    <div class="r"><span class="k">Date</span><span class="v">${fmtDate()}</span></div>
-    <div class="r" style="border-top:1px solid var(--green-line);margin-top:6px;padding-top:8px"><span class="k">Items</span><span class="v">${cart.length}</span></div>`;
-  cart.forEach(it=>r+=`<div class="r"><span class="k">${it.emo} ${it.name}</span><span class="v">${it.qty} ${unitLabel(it.unit)}</span></div>`);
+  let r=`<div class="r"><span class="k">${t('lbl_agency')}</span><span class="v">${$('agencyName').value} (#${$('agencyNum').value})</span></div>
+    <div class="r"><span class="k">${t('lbl_picked_by')}</span><span class="v">${$('firstName').value} ${$('lastName').value}</span></div>
+    <div class="r"><span class="k">${t('lbl_date')}</span><span class="v">${fmtDate()}</span></div>
+    <div class="r" style="border-top:1px solid var(--green-line);margin-top:6px;padding-top:8px"><span class="k">${t('lbl_items')}</span><span class="v">${cart.length}</span></div>`;
+  cart.forEach(it=>r+=`<div class="r"><span class="k">${it.emo} ${dispName(it)}</span><span class="v">${it.qty} ${unitLabel(it.unit)}</span></div>`);
   $(targetId).innerHTML=r;
 }
 
@@ -573,7 +757,7 @@ $('submitBtn').addEventListener('click',()=>{
   };
   $('ordNum').textContent=lastOrder.ord;
   const recips=[STATE.settings.orgEmail];if(lastOrder.agencyEmail)recips.push(lastOrder.agencyEmail);
-  $('emailPill').innerHTML='✉ Confirmation emailed to <b>'+recips.join('</b> and <b>')+'</b>';
+  $('emailPill').innerHTML='✉ '+t('emailed_to')+' <b>'+recips.join('</b> '+t('and')+' <b>')+'</b>';
   cloudPost({action:'order',order:lastOrder});
   const {sig,...orderNoSig}=lastOrder;
   ORDERS.push({...orderNoSig,ts:new Date().toISOString()});
@@ -612,14 +796,32 @@ function invoiceHTML(o){
     <div class="ftr">Second Harvest of Silicon Valley · Ending hunger in our community · This invoice confirms the food quantities received above.</div>`;
 }
 $('printInv').addEventListener('click',()=>{
-  $('printArea').innerHTML=invoiceHTML(lastOrder);
-  const img=$('printArea').querySelector('img');
-  let done=false;
-  const go=()=>{if(done)return;done=true;document.body.classList.add('printing');window.print();};
-  if(img&&!img.complete){img.onload=go;img.onerror=go;setTimeout(go,700);}
-  else go();
+  if(!lastOrder){alert('No pickup to print yet.');return;}
+  const o=lastOrder;
+  const rows=o.items.map(it=>`<tr><td>${it.name}</td><td>${it.code}</td><td>${it.unit==='case'?'Case':'Pound'}</td><td style="text-align:right;font-weight:bold">${it.qty} ${unitLabel(it.unit)}</td></tr>`).join('');
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>Invoice ${o.ord}</title><style>
+    body{font-family:Georgia,serif;color:#000;max-width:720px;margin:0 auto;padding:36px}
+    .inv-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2f5e1c;padding-bottom:14px}
+    .org{font-size:22px;font-weight:bold;color:#2f5e1c}.org small{display:block;font-size:11px;letter-spacing:3px;color:#4a8a2e;font-weight:normal}
+    h1{font-size:16px;text-align:right;margin:0;color:#333}
+    .meta{display:flex;gap:40px;margin:18px 0}.meta div{font-size:13px;line-height:1.7}.meta b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#777}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+    th{text-align:left;border-bottom:2px solid #2f5e1c;padding:8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+    td{padding:9px 6px;border-bottom:1px solid #ddd}
+    .sig{margin-top:50px}.sig img{max-width:260px;border-bottom:1px solid #000;display:block}.sig .cap{font-size:11px;color:#555;margin-top:4px}
+    .ftr{margin-top:40px;font-size:11px;color:#888;text-align:center;border-top:1px solid #ddd;padding-top:12px}
+    </style></head><body>
+    <div class="inv-head"><div class="org">Second Harvest<small>OF SILICON VALLEY</small></div><h1>FOOD PICKUP INVOICE<br>${o.ord}</h1></div>
+    <div class="meta"><div><b>Agency</b>${o.agencyName}<br>#${o.agencyNum}${o.agencyEmail?'<br>'+o.agencyEmail:''}</div><div><b>Picked up by</b>${o.picker}</div><div><b>Date</b>${o.date}</div></div>
+    <table><thead><tr><th>Item</th><th>Code</th><th>Unit</th><th style="text-align:right">Quantity</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="sig"><img src="${o.sig||''}" alt=""><div class="cap">Authorized signature — ${o.picker}, ${o.agencyName}</div></div>
+    <div class="ftr">Second Harvest of Silicon Valley · Ending hunger in our community · This invoice confirms the food quantities received above.</div>
+    <script>window.onload=function(){var im=document.images[0];function go(){setTimeout(function(){window.focus();window.print();},150);}if(im&&!im.complete){im.onload=go;im.onerror=go;setTimeout(go,900);}else go();};<\/script>
+    </body></html>`;
+  const w=window.open('','_blank');
+  if(!w){alert('Please allow pop-ups for this site to print the invoice.');return;}
+  w.document.open();w.document.write(doc);w.document.close();
 });
-window.addEventListener('afterprint',()=>document.body.classList.remove('printing'));
 
 $('newSession').addEventListener('click',()=>{
   cart.length=0;currentCode=null;editIndex=null;sigDataUrl=null;
@@ -643,7 +845,7 @@ document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',
   b.classList.add('on');$('tab-'+b.dataset.tab).classList.add('on');
 }));
 
-function renderAdmin(){renderProducts();renderAgencies();renderOrders();
+function renderAdmin(){renderProducts();renderHub();renderAgencies();renderOrders();
   $('setOrgEmail').value=STATE.settings.orgEmail;$('setSheetUrl').value=STATE.settings.sheetUrl||'';
   $('setSubtitle').value=STATE.settings.subtitle;$('setPin').value=STATE.settings.pin;}
 
@@ -653,8 +855,10 @@ function renderProducts(){
     const card=document.createElement('div');card.className='cfg-card';
     card.innerHTML=`<div class="top"><span class="ttl">${p.emo||'📦'} ${p.name||'New item'}</span><button class="del">Delete</button></div>
       <div class="grid">
-        <div><label>Name</label><input class="pn" type="text" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Name (EN)</label><input class="pn" type="text" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
         <div><label>Code (QR)</label><input class="pc" type="text" value="${p.code||''}"></div>
+        <div><label>Name (ES)</label><input class="pnes" type="text" value="${(p.name_es||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Name (中文)</label><input class="pnzh" type="text" value="${(p.name_zh||'').replace(/"/g,'&quot;')}"></div>
         <div><label>Unit</label><select class="pu"><option value="lbs"${p.unit==='lbs'?' selected':''}>Pounds (lbs)</option><option value="case"${p.unit==='case'?' selected':''}>Cases</option></select></div>
         <div><label>Limit qty (0 = none)</label><input class="pl" type="number" min="0" value="${p.limit||0}"></div>
         <div><label>Icon</label><input class="pe" type="text" value="${p.emo||''}" maxlength="2"></div>
@@ -667,6 +871,8 @@ function readProducts(){
   const cards=$('prodList').querySelectorAll('.cfg-card');const arr=[];
   cards.forEach(cd=>{arr.push({
     name:cd.querySelector('.pn').value.trim()||'Untitled',
+    name_es:cd.querySelector('.pnes')?cd.querySelector('.pnes').value.trim():'',
+    name_zh:cd.querySelector('.pnzh')?cd.querySelector('.pnzh').value.trim():'',
     code:cd.querySelector('.pc').value.trim()||('PRD-'+Math.floor(100+Math.random()*900)),
     unit:cd.querySelector('.pu').value,
     limit:parseFloat(cd.querySelector('.pl').value)||0,
@@ -676,15 +882,83 @@ function readProducts(){
 }
 $('addProd').addEventListener('click',()=>{STATE.products.push({code:'',name:'',emo:'📦',unit:'lbs',limit:0});renderProducts();
   $('prodList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
-$('saveProd').addEventListener('click',()=>{STATE.products=readProducts();saveConfig();renderProducts();cloudPost({action:'saveItems',items:STATE.products});toast('Items saved ✓');});
+$('saveProd').addEventListener('click',()=>{STATE.products=readProducts();saveConfig();renderProducts();renderAgencies();cloudPost({action:'saveItems',items:STATE.products});toast('Main items saved ✓');});
+
+// ---- Hub items (separate management) ----
+function renderHub(){
+  const c=$('hubList');c.innerHTML='';
+  STATE.hubProducts.forEach((p,i)=>{
+    const card=document.createElement('div');card.className='cfg-card';
+    card.innerHTML=`<div class="top"><span class="ttl">${p.emo||'📦'} ${p.name||'New hub item'}</span><button class="del">Delete</button></div>
+      <div class="grid">
+        <div><label>Name (EN)</label><input class="pn" type="text" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Code (QR)</label><input class="pc" type="text" value="${p.code||''}"></div>
+        <div><label>Name (ES)</label><input class="pnes" type="text" value="${(p.name_es||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Name (中文)</label><input class="pnzh" type="text" value="${(p.name_zh||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Unit</label><select class="pu"><option value="lbs"${p.unit==='lbs'?' selected':''}>Pounds (lbs)</option><option value="case"${p.unit==='case'?' selected':''}>Cases</option></select></div>
+        <div><label>Limit qty (0 = none)</label><input class="pl" type="number" min="0" value="${p.limit||0}"></div>
+        <div><label>Icon</label><input class="pe" type="text" value="${p.emo||''}" maxlength="2"></div>
+      </div>`;
+    card.querySelector('.del').addEventListener('click',()=>{STATE.hubProducts.splice(i,1);renderHub();});
+    c.appendChild(card);
+  });
+}
+function readHub(){
+  const cards=$('hubList').querySelectorAll('.cfg-card');const arr=[];
+  cards.forEach(cd=>{arr.push({
+    name:cd.querySelector('.pn').value.trim()||'Untitled',
+    name_es:cd.querySelector('.pnes')?cd.querySelector('.pnes').value.trim():'',
+    name_zh:cd.querySelector('.pnzh')?cd.querySelector('.pnzh').value.trim():'',
+    code:cd.querySelector('.pc').value.trim()||('HUB-'+Math.floor(100+Math.random()*900)),
+    unit:cd.querySelector('.pu').value,
+    limit:parseFloat(cd.querySelector('.pl').value)||0,
+    emo:cd.querySelector('.pe').value.trim()||'📦'
+  });});
+  return arr;
+}
+$('addHub').addEventListener('click',()=>{STATE.hubProducts.push({code:'',name:'',emo:'📦',unit:'lbs',limit:0});renderHub();
+  $('hubList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
+$('saveHub').addEventListener('click',()=>{STATE.hubProducts=readHub();saveConfig();renderHub();renderAgencies();cloudPost({action:'saveHubItems',hubProducts:STATE.hubProducts});toast('Hub items saved ✓');});
+$('tplHub').addEventListener('click',()=>{
+  if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — please try again in a moment.');return;}
+  const rows=[['Name','Code','Unit','Limit','Icon']];
+  STATE.hubProducts.forEach(p=>rows.push([p.name,p.code,p.unit,p.limit||0,p.emo||'']));
+  const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Hub Items');XLSX.writeFile(wb,'shfb-hub-items-template.xlsx');
+});
+$('impHub').addEventListener('click',()=>$('fileHub').click());
+$('fileHub').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      const items=rows.map(r=>({
+        name:String(rowGet(r,['Name','Product','Item Description','Description'])).trim(),
+        code:String(rowGet(r,['Code','QR','SKU','Item #','Item Number','Item'])).trim(),
+        unit:String(rowGet(r,['Unit','UOM','Measurement'])).toLowerCase().startsWith('c')?'case':'lbs',
+        limit:parseFloat(rowGet(r,['Limit','Limit Qty','Unit Qty','Max']))||0,
+        emo:String(rowGet(r,['Icon','Emoji'])).trim()||'📦'
+      })).filter(x=>x.name);
+      items.forEach(x=>{if(!x.code)x.code='HUB-'+Math.floor(100+Math.random()*900);});
+      if(!items.length){alert('No hub item rows found. Make sure your sheet has a Name/Description column.');}
+      else if(confirm('Replace all '+STATE.hubProducts.length+' hub items with '+items.length+' from this file?')){
+        STATE.hubProducts=items;saveConfig();renderHub();renderAgencies();toast('Imported '+items.length+' hub items ✓');
+      }
+    }catch(err){alert('Could not read that file: '+err.message);}
+    $('fileHub').value='';
+  };
+  rd.readAsArrayBuffer(f);
+});
 
 function renderAgencies(){
   const c=$('agcyList');c.innerHTML='';
   STATE.agencies.forEach((a,i)=>{
     const card=document.createElement('div');card.className='cfg-card';
-    const ov=STATE.products.map(p=>{
+    const ov=allItems().map(p=>{
       const val=(a.limits&&a.limits[p.code])?a.limits[p.code]:'';
-      return `<div class="ov-row"><span class="ovn">${p.emo||'📦'} ${p.name}</span><input class="ovi" data-code="${p.code}" type="number" min="0" placeholder="${p.limit||'—'}" value="${val}"><span class="du">${unitLabel(p.unit)}</span></div>`;
+      const hub=isHubCode(p.code)?' <span style="color:var(--orange);font-weight:800">HUB</span>':'';
+      return `<div class="ov-row"><span class="ovn">${p.emo||'📦'} ${p.name}${hub}</span><input class="ovi" data-code="${p.code}" type="number" min="0" placeholder="${p.limit||'—'}" value="${val}"><span class="du">${unitLabel(p.unit)}</span></div>`;
     }).join('');
     card.innerHTML=`<div class="top"><span class="ttl">${a.name||'New agency'}</span><button class="del">Delete</button></div>
       <div class="grid">
@@ -692,6 +966,7 @@ function renderAgencies(){
         <div><label>Name</label><input class="am" type="text" value="${(a.name||'').replace(/"/g,'&quot;')}"></div>
       </div>
       <label>Confirmation email</label><input class="ae" type="email" value="${a.email||''}">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--green-dark);font-weight:700;font-size:12.5px"><input class="ahub" type="checkbox" style="width:auto" ${a.hub?'checked':''}> Can pick Hub items</label>
       <button class="ov-toggle">⚙ Per-item limits (overrides) ▾</button>
       <div class="ov-panel"><div class="mini">Blank = use the item's default limit (shown as placeholder).</div>${ov}</div>`;
     card.querySelector('.del').addEventListener('click',()=>{STATE.agencies.splice(i,1);renderAgencies();});
@@ -705,11 +980,11 @@ function readAgencies(){
     const limits={};
     cd.querySelectorAll('.ovi').forEach(inp=>{const v=parseFloat(inp.value);if(v>0)limits[inp.dataset.code]=v;});
     arr.push({number:cd.querySelector('.an').value.trim(),name:cd.querySelector('.am').value.trim()||'Untitled',
-      email:cd.querySelector('.ae').value.trim(),limits});
+      email:cd.querySelector('.ae').value.trim(),hub:cd.querySelector('.ahub').checked,limits});
   });
   return arr;
 }
-$('addAgcy').addEventListener('click',()=>{STATE.agencies.push({number:'',name:'',email:'',limits:{}});renderAgencies();
+$('addAgcy').addEventListener('click',()=>{STATE.agencies.push({number:'',name:'',email:'',hub:false,limits:{}});renderAgencies();
   $('agcyList').lastChild.scrollIntoView({behavior:'smooth',block:'center'});});
 $('saveAgcy').addEventListener('click',()=>{STATE.agencies=readAgencies();saveConfig();renderAgencies();cloudPost({action:'saveAgencies',agencies:STATE.agencies});toast('Agencies saved ✓');});
 
@@ -735,16 +1010,23 @@ function renderOrders(){
     <div class="r"><span class="k">Total line items</span><span class="v">${lines}</span></div>`;
   const list=$('ordersList');list.innerHTML='';
   if(!ORDERS.length){list.innerHTML='<div class="empty">No pickups submitted yet on this device.</div>';return;}
-  ORDERS.slice().reverse().forEach(o=>{
+  ORDERS.slice().reverse().forEach((o,ri)=>{
+    const realIdx=ORDERS.length-1-ri;
     const d=document.createElement('div');d.className='cart-item';
-    d.innerHTML=`<div class="info"><div class="nm">${o.ord} · ${o.agencyName}</div><div class="q">${o.date} · ${o.picker} · ${o.items.length} item(s)</div></div>`;
+    d.innerHTML=`<div class="info"><div class="nm">${o.ord} · ${o.agencyName}</div><div class="q">${o.date} · ${o.picker} · ${o.items.length} item(s)</div></div><button class="rm">Delete</button>`;
+    d.querySelector('.rm').addEventListener('click',()=>{
+      if(confirm('Delete order '+o.ord+' ('+o.agencyName+')? This cannot be undone.')){
+        ORDERS.splice(realIdx,1);saveOrders();renderOrders();toast('Order deleted ✓');
+      }
+    });
     list.appendChild(d);
   });
 }
 $('exportCsv').addEventListener('click',()=>{
   if(typeof XLSX==='undefined'){alert('Spreadsheet library still loading — try again in a moment.');return;}
   if(!ORDERS.length){alert('No saved orders to export.');return;}
-  const prods=STATE.products, n=prods.length;
+  try{
+  const prods=STATE.products.concat(STATE.hubProducts||[]), n=prods.length;
   const FIRST=4;                       // column E (0-based) = first product column
   const last=FIRST+n-1;                // last product column (0-based)
   const START=6;                       // sheet row (1-based) where orders begin
@@ -775,7 +1057,7 @@ $('exportCsv').addEventListener('click',()=>{
     rw[2]=o.ts?new Date(o.ts).toLocaleDateString('en-US'):o.date;
     F(idx,3,`SUM(${col(FIRST)}${sheetRow}:${col(last)}${sheetRow})`);
     prods.forEach((p,j)=>{
-      const q=o.items.filter(it=>it.code===p.code).reduce((s,it)=>s+(+it.qty||0),0);
+      const q=o.items.filter(it=>it.code===p.code&&it.unit===p.unit).reduce((s,it)=>s+(+it.qty||0),0);
       if(q>0)rw[FIRST+j]=q;
     });
   });
@@ -787,6 +1069,7 @@ $('exportCsv').addEventListener('click',()=>{
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Grocery Rescue');
   XLSX.writeFile(wb,'grocery-rescue-import-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  }catch(err){alert('Export failed: '+err.message);}
 });
 $('pushSheets').addEventListener('click',async()=>{
   const url=STATE.settings.sheetUrl;
@@ -834,10 +1117,10 @@ $('fileProd').addEventListener('change',e=>{
       const wb=XLSX.read(ev.target.result,{type:'array'});
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
       const items=rows.map(r=>({
-        name:String(rowGet(r,['Name','Item','Product'])).trim(),
-        code:String(rowGet(r,['Code','QR','SKU'])).trim(),
-        unit:String(rowGet(r,['Unit','UOM'])).toLowerCase().startsWith('case')?'case':'lbs',
-        limit:parseFloat(rowGet(r,['Limit','Limit Qty','Max']))||0,
+        name:String(rowGet(r,['Name','Product','Item Description','Description'])).trim(),
+        code:String(rowGet(r,['Code','QR','SKU','Item #','Item Number','Item'])).trim(),
+        unit:String(rowGet(r,['Unit','UOM','Measurement'])).toLowerCase().startsWith('c')?'case':'lbs',
+        limit:parseFloat(rowGet(r,['Limit','Limit Qty','Unit Qty','Max']))||0,
         emo:String(rowGet(r,['Icon','Emoji'])).trim()||'📦'
       })).filter(x=>x.name);
       items.forEach(x=>{if(!x.code)x.code='PRD-'+Math.floor(100+Math.random()*900);});
@@ -917,7 +1200,8 @@ function cloudPost(payload){
 }
 
 // ---------- Init ----------
-applySubtitle();applyHint();checkIntake();renderCart();cloudLoadConfig();
+$('langSel').addEventListener('change',e=>{LANG=e.target.value;try{localStorage.setItem(LANG_KEY,LANG);}catch(e){}applyLang();});
+applyLang();checkIntake();cloudLoadConfig();
 </script>
 </body>
 </html>
